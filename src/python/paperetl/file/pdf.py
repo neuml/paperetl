@@ -14,12 +14,13 @@ class PDF(object):
     """
 
     @staticmethod
-    def parse(stream, models):
+    def parse(stream, source, models):
         """
         Parses a medical/scientific PDF datastream and returns a processed article.
 
         Args:
             stream: handle to input data stream
+            source: text string describing stream source, can be None
             models: path to study models
 
         Returns:
@@ -27,7 +28,7 @@ class PDF(object):
         """
 
         # Convert PDF stream to TEI XML, parse and return object
-        return TEI.parse(PDF.convert(stream), models)
+        return TEI.parse(PDF.convert(stream), source, models)
 
     @staticmethod
     def convert(stream):

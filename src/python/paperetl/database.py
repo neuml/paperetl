@@ -7,16 +7,12 @@ class Database(object):
     Defines data structures and methods to store article content.
     """
 
-    def save(self, uid, article, sections, tags, design):
+    def save(self, article):
         """
         Saves an article.
 
         Args:
-            uid: unique id
-            article: article metadata
-            section: list of sections
-            tags: list of tags
-            design: study design
+            article: article metadata and text content
         """
 
     def complete(self, citations):

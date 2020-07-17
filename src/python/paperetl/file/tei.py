@@ -2,6 +2,7 @@
 TEI (Text Encoding Initiative) XML processing module
 """
 
+import datetime
 import hashlib
 
 from bs4 import BeautifulSoup
@@ -9,6 +10,7 @@ from nltk.tokenize import sent_tokenize
 
 from ..analysis import Study
 from ..grammar import Grammar
+from ..schema.article import Article
 from ..text import Text
 
 # Global helper for multi-processing support
@@ -80,7 +82,9 @@ class TEI(object):
             published = published["when"] if published and "when" in published.attrs else None
             publication = publication.text if publication else None
             authors = TEI.authors(source)
-            reference = "https://doi.org/" + soup.find("biblstruct").find("idno").text
+
+            struct = soup.find("biblstruct")
+            reference = "https://doi.org/" + struct.find("idno").text if struct and struct.find("idno") else None
         else:
             published, publication, authors, reference = None, None, None, None
 
@@ -150,16 +154,17 @@ class TEI(object):
         return sections
 
     @staticmethod
-    def parse(stream, models):
+    def parse(stream, source, models):
         """
         Parses a TEI XML datastream and returns a processed article.
 
         Args:
             stream: handle to input data stream
+            source: text string describing stream source, can be None
             models: path to study models
 
         Returns:
-            (uid, article metadata, section text, article tags, study design)
+            Article
         """
 
         # Get grammar handle
@@ -188,9 +193,9 @@ class TEI(object):
         # Add additional fields to each section
         sections = [(name, text, labels[x] if labels[x] else grammar.label(tokens)) for x, (name, text, tokens) in enumerate(sections)]
 
-        # Article row - id, source, published, publication, authors, title, tags, design, sample size
-        #               sample section, sample method, reference
-        article = (uid, "PDF", published, publication, authors, title, None, design, size,
-                   sample, method, reference, "2020-07-11")
+        # Article metadata - id, source, published, publication, authors, title, tags, design, sample size
+        #                    sample section, sample method, reference, entry date
+        metadata = (uid, "PDF", published, publication, authors, title, None, design, size,
+                    sample, method, reference, datetime.datetime.now().strftime("%Y-%m-%d"))
 
-        return (uid, article, sections, None, design)
+        return Article(metadata, sections, source)

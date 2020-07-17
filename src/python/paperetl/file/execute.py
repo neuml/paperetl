@@ -38,7 +38,7 @@ class Execute(object):
                 print("Processing: %s" % path)
                 with open(path, "rb" if isPdf else "r") as data:
                     # Parse and save record
-                    db.save(*(PDF.parse(data, models) if isPdf else TEI.parse(data, models)))
+                    db.save(PDF.parse(data, f, models) if isPdf else TEI.parse(data, f, models))
 
         # Complete and close database
         db.complete(None)

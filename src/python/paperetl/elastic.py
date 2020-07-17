@@ -33,17 +33,14 @@ class Elastic(Database):
         }
     }
 
-    # Articles schema
-    ARTICLE = ("id", "source", "published", "publication", "authors", "title", "tags", "design",
-               "size", "sample", "method", "reference", "entry")
-
-    # Sections schema
-    SECTION = ("name", "text", "labels")
-
-    # Citations schema
-    CITATION = ("title", "mentions")
-
     def __init__(self, url):
+        """
+        Connects and initializes an elasticsearch instance.
+
+        Args:
+            url: elasticsearch url
+        """
+
         # Connect to ES instance
         self.connection = Elasticsearch(hosts=[url], timeout=60, retry_on_timeout=True)
 
@@ -57,15 +54,9 @@ class Elastic(Database):
         self.connection.indices.create("articles", Elastic.ARTICLES)
         self.connection.indices.create("citations", Elastic.CITATIONS)
 
-    def save(self, uid, article, sections, tags, design):
-        # Create article
-        article = dict(zip(Elastic.ARTICLE, article))
-
-        # Create sections
-        sections = [dict(zip(Elastic.SECTION, section)) for section in sections]
-
-        # Add sections to article
-        article["sections"] = sections
+    def save(self, article):
+        # Build article
+        article = article.build()
 
         # Bulk action fields
         article["_id"] = article["id"]
@@ -92,9 +83,9 @@ class Elastic(Database):
         # Citation rows
         self.buffer = []
         if citations:
-            for citation in citations.items():
+            for citation in citations:
                 # Build citation
-                citation = dict(zip(Elastic.CITATION, citation))
+                citation = citation.build()
                 citation["_index"] = "citations"
 
                 # Buffer citation

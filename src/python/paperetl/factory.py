@@ -3,6 +3,7 @@ Factory module
 """
 
 from .elastic import Elastic
+from .jsonw import JSON
 from .sqlite import SQLite
 
 class Factory(object):
@@ -22,4 +23,12 @@ class Factory(object):
             Database
         """
 
-        return Elastic(url) if url.startswith("http://") else SQLite(url)
+        if url.startswith("http://"):
+            return Elastic(url)
+        elif url.startswith("json://"):
+            return JSON(url.replace("json://", ""))
+        elif url:
+            # If URL is present, assume it's SQLite
+            return SQLite(url.replace("sqlite://", ""))
+
+        return None

@@ -53,10 +53,10 @@ class SQLite(Database):
 
     def __init__(self, outdir):
         """
-        Connects initializes a new output SQLite database.
+        Creates and initializes a new output SQLite database.
 
         Args:
-            outdir: output directory, if None uses default path
+            outdir: output directory
         """
 
         # Create if output path doesn't exist
@@ -90,9 +90,9 @@ class SQLite(Database):
         # Start transaction
         self.cur.execute("BEGIN")
 
-    def save(self, uid, article, sections, tags, design):
+    def save(self, article):
         # Article row
-        self.insert(SQLite.ARTICLES, "articles", article)
+        self.insert(SQLite.ARTICLES, "articles", article.metadata)
 
         # Increment number of articles processed
         self.aindex += 1
@@ -102,16 +102,16 @@ class SQLite(Database):
             # Commit current transaction and start a new one
             self.transaction()
 
-        for name, text, labels in sections:
+        for name, text, labels in article.sections:
             # Section row - id, article, tags, design, name, text, labels
-            self.insert(SQLite.SECTIONS, "sections", (self.sindex, uid, tags, design, name, text, labels))
+            self.insert(SQLite.SECTIONS, "sections", (self.sindex, article.uid(), article.tags(), article.design(), name, text, labels))
             self.sindex += 1
 
     def complete(self, citations):
         # Citation rows
         if citations:
-            for citation in citations.items():
-                self.insert(SQLite.CITATIONS, "citations", citation)
+            for citation in citations:
+                self.insert(SQLite.CITATIONS, "citations", citation.values)
 
         print("Total articles inserted: {}".format(self.aindex))
 

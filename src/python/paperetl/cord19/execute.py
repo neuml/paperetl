@@ -15,6 +15,8 @@ from dateutil import parser
 from ..analysis import Study
 from ..factory import Factory
 from ..grammar import Grammar
+from ..schema.article import Article
+from ..schema.citation import Citation
 from .section import Section
 
 # Global helper for multi-processing support
@@ -206,12 +208,12 @@ class Execute(object):
             # Clear citations when not a tagged entry
             citations = None
 
-        # Article row - id, source, published, publication, authors, title, tags, design, sample size
-        #               sample section, sample method, reference
-        article = (row["cord_uid"], row["source_x"], date, row["journal"], row["authors"], row["title"], tags, design, size,
-                   sample, method, Execute.getUrl(row))
+        # Article metadata - id, source, published, publication, authors, title, tags, design, sample size
+        #                    sample section, sample method, reference
+        metadata = (row["cord_uid"], row["source_x"], date, row["journal"], row["authors"], row["title"], tags, design, size,
+                    sample, method, Execute.getUrl(row))
 
-        return (row["cord_uid"], sha, article, sections, tags, design, citations)
+        return (sha, Article(metadata, sections, None), citations)
 
     @staticmethod
     def entryDates(indir, entryfile):
@@ -268,24 +270,24 @@ class Execute(object):
 
         # Create process pool
         with Pool(os.cpu_count()) as pool:
-            for uid, sha, article, sections, tags, design, cite in pool.imap(Execute.process, Execute.stream(indir, models), 100):
+            for sha, article, cite in pool.imap(Execute.process, Execute.stream(indir, models), 100):
                 # Skip rows with hashes that have already been processed
                 # Only load untagged rows if this is a full database load
-                if sha not in hashes and (full or tags):
+                if sha not in hashes and (full or article.tags()):
                     # Append entry date
-                    article = article + (dates[sha],)
+                    article.metadata = article.metadata + (dates[sha],)
 
                     # Store citation reference
                     citations.update(cite)
 
-                    # Article row
-                    db.save(uid, article, sections, tags, design)
+                    # Save article
+                    db.save(article)
 
                     # Store article hash as processed
                     hashes.add(sha)
 
         # Complete processing
-        db.complete(citations)
+        db.complete([Citation(citation) for citation in citations.items()])
 
         # Commit and close
         db.close()
