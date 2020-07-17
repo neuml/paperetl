@@ -32,7 +32,7 @@ setup(name="paperetl",
           "requests>=2.22.0",
           "scikit-learn>=0.22.2.post1",
           "scipy>=1.4.1",
-          "spacy>=2.2.4",
+          "spacy>=2.3.2",
           "word2number>=1.1"
       ],
       classifiers=[

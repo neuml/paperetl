@@ -263,7 +263,7 @@ class Execute(object):
             models = url
 
         # Article, section index, database, processed ids, citations
-        db, hashes, citations = Factory.create(url), set(), Counter()
+        db, ids, hashes, citations = Factory.create(url), set(), set(), Counter()
 
         # Load entry dates
         dates = Execute.entryDates(indir, entryfile)
@@ -271,9 +271,12 @@ class Execute(object):
         # Create process pool
         with Pool(os.cpu_count()) as pool:
             for sha, article, cite in pool.imap(Execute.process, Execute.stream(indir, models), 100):
-                # Skip rows with hashes that have already been processed
+                # Get unique id
+                uid = article.uid()
+
+                # Skip rows with ids/hashes that have already been processed
                 # Only load untagged rows if this is a full database load
-                if sha not in hashes and (full or article.tags()):
+                if uid not in ids and sha not in hashes and (full or article.tags()):
                     # Append entry date
                     article.metadata = article.metadata + (dates[sha],)
 
@@ -282,6 +285,9 @@ class Execute(object):
 
                     # Save article
                     db.save(article)
+
+                    # Store article uid as processed
+                    ids.add(uid)
 
                     # Store article hash as processed
                     hashes.add(sha)
