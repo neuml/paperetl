@@ -1,5 +1,5 @@
 """
-StudyModel module
+Study module
 """
 
 import math

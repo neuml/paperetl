@@ -11,21 +11,15 @@ class Factory(object):
     """
 
     @staticmethod
-    def create(backend, args):
+    def create(url):
         """
         Creates a new database connection.
 
         Args:
-            backend: database type
-            args: database arguments
+            url: connection url
 
         Returns:
             Database
         """
 
-        if backend == "elasticsearch":
-            return Elastic(*args)
-        elif backend == "sqlite":
-            return SQLite(*args)
-
-        return None
+        return Elastic(url) if url.startswith("http://") else SQLite(url)

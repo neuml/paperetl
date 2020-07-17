@@ -1,5 +1,5 @@
 """
-Metadata module. Derives additional metadata fields.
+Analysis module
 """
 
 import os
@@ -14,10 +14,13 @@ from .study.sample import Sample
 # pylint: disable=W0603
 MODELS = None
 
-def getModels(outdir):
+def getModels(models):
     """
     Multiprocessing helper method. Gets (or first creates then gets) a global study models object to
     be accessed in a new subprocess.
+
+    Args:
+        models: models directory
 
     Returns:
         (attribute model, design model)
@@ -27,35 +30,35 @@ def getModels(outdir):
 
     if not MODELS:
         attribute = Attribute()
-        attribute.load(os.path.join(outdir, "attribute"))
+        attribute.load(os.path.join(models, "attribute"))
 
         design = Design()
-        design.load(os.path.join(outdir, "design"))
+        design.load(os.path.join(models, "design"))
 
         MODELS = (attribute, design)
 
     return MODELS
 
-class Metadata(object):
+class Study(object):
     """
-    Methods to derive additional metadata fields for a study contained within an article.
+    Study design parser. Derives study design fields using a series of machine learning models and NLP analysis.
     """
 
     @staticmethod
-    def parse(sections, outdir):
+    def parse(sections, models):
         """
-        Parses metadata fields contained within an article.
+        Parses study design fields contained within an article.
 
         Args:
             sections: list of text sections
-            outdir: output directory
+            models: models directory
 
         Returns:
-            metadata fields as tuple
+            study design fields as tuple
         """
 
         # Get design models
-        attribute, design = getModels(outdir)
+        attribute, design = getModels(models)
 
         # Study design type
         design = design.predict(sections)

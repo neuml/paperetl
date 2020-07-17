@@ -1,5 +1,5 @@
 """
-StudyModel module
+Attribute module
 """
 
 import csv

@@ -1,5 +1,5 @@
 """
-Transforms raw CORD-19 data into an articles database.
+Transforms and loads CORD-19 data into an articles database.
 """
 
 import csv
@@ -12,9 +12,9 @@ from datetime import datetime
 from multiprocessing import Pool
 from dateutil import parser
 
+from ..analysis import Study
 from ..factory import Factory
 from ..grammar import Grammar
-from ..metadata import Metadata
 from .section import Section
 
 # Global helper for multi-processing support
@@ -39,7 +39,7 @@ def getGrammar():
 
 class Execute(object):
     """
-    Transforms raw csv/json files and loads into an articles database.
+    Transforms and loads CORD-19 data into an articles database.
     """
 
     @staticmethod
@@ -141,18 +141,18 @@ class Execute(object):
         return tags
 
     @staticmethod
-    def stream(indir, outdir):
+    def stream(indir, models):
         """
         Generator that yields rows from a metadata.csv file. The directory is also included.
 
         Args:
             indir: input directory
-            outdir: output directory
+            models: models directory
         """
 
         with open(os.path.join(indir, "metadata.csv"), mode="r") as csvfile:
             for row in csv.DictReader(csvfile):
-                yield (row, indir, outdir)
+                yield (row, indir, models)
 
     @staticmethod
     def process(params):
@@ -160,7 +160,7 @@ class Execute(object):
         Processes a single row
 
         Args:
-            params: (row, indir, outdir)
+            params: (row, indir, models)
 
         Returns:
             (id, article, sections)
@@ -170,7 +170,7 @@ class Execute(object):
         grammar = getGrammar()
 
         # Unpack parameters
-        row, indir, outdir = params
+        row, indir, models = params
 
         # Get sha hash
         sha = Execute.getHash(row)
@@ -191,8 +191,8 @@ class Execute(object):
             # Join NLP tokens with sections
             sections = [(name, text, tokenslist[x]) for x, (name, text) in enumerate(sections)]
 
-            # Derive metadata fields
-            design, size, sample, method, labels = Metadata.parse(sections, outdir)
+            # Parse study design fields
+            design, size, sample, method, labels = Study.parse(sections, models)
 
             # Add additional fields to each section
             sections = [(name, text, labels[x] if labels[x] else grammar.label(tokens)) for x, (name, text, tokens) in enumerate(sections)]
@@ -241,35 +241,34 @@ class Execute(object):
         return dates
 
     @staticmethod
-    def run(indir, outdir, entryfile, full):
+    def run(indir, url, models, entryfile, full):
         """
         Main execution method.
 
         Args:
             indir: input directory
-            outdir: output directory
+            url: database url
+            models: model directory
             entryfile: path to entry dates file
             full: full database load if True, only loads tagged articles if False
         """
 
         print("Building articles database from {}".format(indir))
 
-        # Default output directory if not provided
-        if not outdir:
-            outdir = os.path.join(os.path.expanduser("~"), ".cord19", "models")
-
-        # Create if output path doesn't exist
-        os.makedirs(outdir, exist_ok=True)
+        # Set database url and models defaults if not provided
+        if not url:
+            url = os.path.join(os.path.expanduser("~"), ".cord19", "models")
+            models = url
 
         # Article, section index, database, processed ids, citations
-        db, hashes, citations = Factory.create("sqlite", (outdir,)), set(), Counter()
+        db, hashes, citations = Factory.create(url), set(), Counter()
 
         # Load entry dates
         dates = Execute.entryDates(indir, entryfile)
 
         # Create process pool
         with Pool(os.cpu_count()) as pool:
-            for uid, sha, article, sections, tags, design, cite in pool.imap(Execute.process, Execute.stream(indir, outdir), 100):
+            for uid, sha, article, sections, tags, design, cite in pool.imap(Execute.process, Execute.stream(indir, models), 100):
                 # Skip rows with hashes that have already been processed
                 # Only load untagged rows if this is a full database load
                 if sha not in hashes and (full or tags):

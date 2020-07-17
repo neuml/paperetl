@@ -66,7 +66,7 @@ class Elastic(Database):
 
         # Add sections to article
         article["sections"] = sections
- 
+
         # Bulk action fields
         article["_id"] = article["id"]
         article["_index"] = "articles"
@@ -91,22 +91,23 @@ class Elastic(Database):
 
         # Citation rows
         self.buffer = []
-        for citation in citations.items():
-            # Build citation
-            citation = dict(zip(Elastic.CITATION, citation))
-            citation["_index"]  = "citations"
+        if citations:
+            for citation in citations.items():
+                # Build citation
+                citation = dict(zip(Elastic.CITATION, citation))
+                citation["_index"] = "citations"
 
-            # Buffer citation
-            self.buffer.append(citation)
+                # Buffer citation
+                self.buffer.append(citation)
 
-            # Bulk load every 5000 records
-            if len(self.buffer) >= 5000:
+                # Bulk load every 5000 records
+                if len(self.buffer) >= 5000:
+                    helpers.bulk(self.connection, self.buffer)
+                    self.buffer = []
+
+            # Final citation batch
+            if self.buffer:
                 helpers.bulk(self.connection, self.buffer)
-                self.buffer = []
-
-        # Final citation batch
-        if self.buffer:
-            helpers.bulk(self.connection, self.buffer)
 
         print("Total articles inserted: {}".format(self.rows))
 

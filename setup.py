@@ -22,6 +22,7 @@ setup(name="paperetl",
       keywords="etl parse covid-19 medical scientific papers",
       python_requires=">=3.6",
       install_requires=[
+          "beautifulsoup4>=4.8.1",
           "elasticsearch>=7.8.0",
           "lxml>=4.5.0",
           "nltk>=3.5",

@@ -59,6 +59,9 @@ class SQLite(Database):
             outdir: output directory, if None uses default path
         """
 
+        # Create if output path doesn't exist
+        os.makedirs(outdir, exist_ok=True)
+
         # Output database file
         dbfile = os.path.join(outdir, "articles.sqlite")
 
@@ -106,8 +109,9 @@ class SQLite(Database):
 
     def complete(self, citations):
         # Citation rows
-        for citation in citations.items():
-            self.insert(SQLite.CITATIONS, "citations", citation)
+        if citations:
+            for citation in citations.items():
+                self.insert(SQLite.CITATIONS, "citations", citation)
 
         print("Total articles inserted: {}".format(self.aindex))
 
@@ -168,8 +172,8 @@ class SQLite(Database):
         # Build insert prepared statement
         columns = [name for name, _ in table.items()]
         insert = SQLite.INSERT_ROW.format(table=name,
-                                            columns=", ".join(columns),
-                                            values=("?, " * len(columns))[:-2])
+                                          columns=", ".join(columns),
+                                          values=("?, " * len(columns))[:-2])
 
         try:
             # Execute insert statement
