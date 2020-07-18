@@ -52,7 +52,7 @@ class Design(StudyModel):
         # Build features array for document
         features = [self.features(sections)]
 
-        return self.model.predict(features)[0]
+        return int(self.model.predict(features)[0])
 
     def create(self):
         return RandomForestClassifier(n_estimators=129, max_depth=21, max_features=0.22, random_state=0)
