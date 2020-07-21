@@ -23,11 +23,8 @@ Python 3.6+ is supported
 PDF parsing relies on an existing GROBID instance to be up and running. It is assumed that this is running locally on the ETL server. This is not
 necessary for the CORD-19 dataset.
 
-[GROBID install instructions](https://grobid.readthedocs.io/en/latest/Install-Grobid/)
-
-Once installed, start the service using the following instructions:
-
-[GROBID start service](https://grobid.readthedocs.io/en/latest/Grobid-service/)
+- [GROBID install instructions](https://grobid.readthedocs.io/en/latest/Install-Grobid/)
+- [GROBID start service](https://grobid.readthedocs.io/en/latest/Grobid-service/)
 
 ## Examples
 
