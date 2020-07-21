@@ -20,6 +20,10 @@ You can install paperetl directly from GitHub using pip. Using a Python Virtual 
 Python 3.6+ is supported
 
 ## Additional dependencies
+Study design detection uses scispacy and can be installed via:
+
+    pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.2.5/en_core_sci_md-0.2.5.tar.gz
+
 PDF parsing relies on an existing GROBID instance to be up and running. It is assumed that this is running locally on the ETL server. This is not
 necessary for the CORD-19 dataset.
 
