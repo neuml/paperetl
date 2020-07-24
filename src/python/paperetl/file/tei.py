@@ -6,11 +6,13 @@ import datetime
 import hashlib
 
 from bs4 import BeautifulSoup
+from dateutil import parser
 from nltk.tokenize import sent_tokenize
 
 from ..analysis import Study
 from ..grammar import Grammar
 from ..schema.article import Article
+from ..table import Table
 from ..text import Text
 
 # Global helper for multi-processing support
@@ -79,7 +81,7 @@ class TEI(object):
             publication = source.find("monogr").find("title")
 
             # Parse publication information
-            published = published["when"] if published and "when" in published.attrs else None
+            published = parser.parse(published["when"]) if published and "when" in published.attrs else None
             publication = publication.text if publication else None
             authors = TEI.authors(source)
 
@@ -151,6 +153,16 @@ class TEI(object):
             # Split text into sentences, transform text and add to sections
             sections.extend([(name, x) for x in sent_tokenize(text)])
 
+        # Extract text from tables
+        for figure in soup.find("text").find_all("figure"):
+            # Get figure name
+            name = str(figure.contents[0])
+
+            # Search for table
+            table = figure.find("table")
+            if table:
+                sections.extend([(name, x) for x in Table.extract(table)])
+
         return sections
 
     @staticmethod
@@ -173,7 +185,6 @@ class TEI(object):
         soup = BeautifulSoup(stream, "lxml")
 
         title = soup.title.text
-        uid = hashlib.sha1(title.encode("utf-8")).hexdigest()
 
         # Extract article metadata
         published, publication, authors, reference = TEI.metadata(soup)
@@ -193,9 +204,15 @@ class TEI(object):
         # Add additional fields to each section
         sections = [(name, text, labels[x] if labels[x] else grammar.label(tokens)) for x, (name, text, tokens) in enumerate(sections)]
 
+        # Derive uid
+        uid = hashlib.sha1(title.encode("utf-8") if title else reference.encode("utf-8")).hexdigest()
+
+        # Default title to source if empty
+        title = title if title else source
+
         # Article metadata - id, source, published, publication, authors, title, tags, design, sample size
         #                    sample section, sample method, reference, entry date
-        metadata = (uid, "PDF", published, publication, authors, title, None, design, size,
+        metadata = (uid, "PDF", published, publication, authors, title, "PDF", design, size,
                     sample, method, reference, datetime.datetime.now().strftime("%Y-%m-%d"))
 
         return Article(metadata, sections, source)
