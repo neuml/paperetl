@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
     DESCRIPTION = f.read()
 
 setup(name="paperetl",
-      version="1.0.0",
+      version="1.1.1",
       author="NeuML",
       description="ETL processes for medical and scientific papers",
       long_description=DESCRIPTION,

@@ -13,7 +13,11 @@ paperetl supports the following databases for storing articles:
 - YAML files
 
 ## Installation
-You can install paperetl directly from GitHub using pip. Using a Python Virtual Environment is recommended.
+The easiest way to install is via pip and PyPI
+
+    pip install paperetl
+
+You can also install paperetl directly from GitHub. Using a Python Virtual Environment is recommended.
 
     pip install git+https://github.com/neuml/paperetl
 
