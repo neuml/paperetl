@@ -41,6 +41,27 @@ class TEI(object):
     """
 
     @staticmethod
+    def date(published):
+        """
+        Attempts to parse a publication date, if available. Otherwise, None is returned.
+
+        Args:
+            published: published object
+
+        Returns:
+            publication date if available/found, None otherwise
+        """
+
+        # Parse publication date
+        # pylint: disable=W0702
+        try:
+            published = parser.parse(published["when"]) if published and "when" in published.attrs else None
+        except:
+            published = None
+
+        return published
+
+    @staticmethod
     def authors(source):
         """
         Builds an authors string from a TEI sourceDesc tag.
@@ -81,7 +102,7 @@ class TEI(object):
             publication = source.find("monogr").find("title")
 
             # Parse publication information
-            published = parser.parse(published["when"]) if published and "when" in published.attrs else None
+            published = TEI.date(published)
             publication = publication.text if publication else None
             authors = TEI.authors(source)
 
