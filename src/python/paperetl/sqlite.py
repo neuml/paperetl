@@ -5,6 +5,8 @@ SQLite module
 import os
 import sqlite3
 
+from datetime import datetime, timedelta
+
 from .database import Database
 
 class SQLite(Database):
@@ -40,16 +42,21 @@ class SQLite(Database):
         "Labels": "TEXT"
     }
 
-    # Citations schema
-    CITATIONS = {
-        "Title": "TEXT PRIMARY KEY",
-        "Mentions": "INTEGER"
-    }
-
     # SQL statements
     CREATE_TABLE = "CREATE TABLE IF NOT EXISTS {table} ({fields})"
     INSERT_ROW = "INSERT INTO {table} ({columns}) VALUES ({values})"
     CREATE_INDEX = "CREATE INDEX section_article ON sections(article)"
+
+    # Merge SQL statements
+    ATTACH_DB = "ATTACH DATABASE '{path}' as {name}"
+    DETACH_DB = "DETACH DATABASE '{name}'"
+    MAX_ENTRY = "SELECT MAX(entry) from {name}.articles"
+    LOOKUP_ARTICLE = "SELECT Id FROM {name}.articles WHERE Id=? AND Entry = ?"
+    MERGE_ARTICLE = "INSERT INTO articles SELECT * FROM {name}.articles WHERE Id = ?"
+    MERGE_SECTIONS = "INSERT INTO sections SELECT * FROM {name}.sections WHERE Article=?"
+    UPDATE_ENTRY = "UPDATE articles SET entry = ? WHERE Id = ?"
+    ARTICLE_COUNT = "SELECT COUNT(1) FROM articles"
+    SECTION_COUNT = "SELECT MAX(id) FROM sections"
 
     def __init__(self, outdir):
         """
@@ -84,11 +91,53 @@ class SQLite(Database):
         # Create sections table
         self.create(SQLite.SECTIONS, "sections")
 
-        # Create citations table
-        self.create(SQLite.CITATIONS, "citations")
-
         # Start transaction
         self.cur.execute("BEGIN")
+
+    def merge(self, url, ids):
+        # List of IDs to set for processing
+        queue = set()
+
+        # Attached database alias
+        alias = "merge"
+
+        # Attach database
+        self.db.execute(SQLite.ATTACH_DB.format(path=url, name=alias))
+
+        # Only process records newer than 5 days before the last run
+        lastrun = self.cur.execute(SQLite.MAX_ENTRY.format(name=alias)).fetchone()[0]
+        lastrun = datetime.strptime(lastrun, "%Y-%m-%d") - timedelta(days=5)
+        lastrun = lastrun.strftime("%Y-%m-%d")
+
+        # Search for existing articles
+        for uid, date in ids.items():
+            self.cur.execute(SQLite.LOOKUP_ARTICLE.format(name=alias), [uid, date])
+            if not self.cur.fetchone() and date > lastrun:
+                # Add uid to process
+                queue.add(uid)
+            else:
+                # Copy existing record
+                self.cur.execute(SQLite.MERGE_ARTICLE.format(name=alias), [uid])
+                self.cur.execute(SQLite.MERGE_SECTIONS.format(name=alias), [uid])
+
+                # Sync entry date with ids list
+                self.cur.execute(SQLite.UPDATE_ENTRY, [date, uid])
+
+        # Set current index positions
+        self.aindex = int(self.cur.execute(SQLite.ARTICLE_COUNT.format(name=alias)).fetchone()[0]) + 1
+        self.sindex = int(self.cur.execute(SQLite.SECTION_COUNT.format(name=alias)).fetchone()[0]) + 1
+
+        # Commit transaction
+        self.db.commit()
+
+        # Detach database
+        self.db.execute(SQLite.DETACH_DB.format(name=alias))
+
+        # Start new transaction
+        self.cur.execute("BEGIN")
+
+        # Return list of new/updated ids to process
+        return queue
 
     def save(self, article):
         # Article row
@@ -107,12 +156,7 @@ class SQLite(Database):
             self.insert(SQLite.SECTIONS, "sections", (self.sindex, article.uid(), article.tags(), article.design(), name, text, labels))
             self.sindex += 1
 
-    def complete(self, citations):
-        # Citation rows
-        if citations:
-            for citation in citations:
-                self.insert(SQLite.CITATIONS, "citations", citation.values)
-
+    def complete(self):
         print("Total articles inserted: {}".format(self.aindex))
 
         # Create articles index for sections table

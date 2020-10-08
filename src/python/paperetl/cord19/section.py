@@ -30,7 +30,6 @@ class Section(object):
         """
 
         sections = []
-        citations = []
 
         # Add title and abstract sections
         for name in ["title", "abstract"]:
@@ -71,15 +70,12 @@ class Section(object):
                         if "html" in entry and entry["html"]:
                             sections.extend([(name, x) for x in Table.parse(entry["html"])])
 
-                    # Extract citations
-                    citations.extend([entry["title"] for entry in data["bib_entries"].values()])
-
             # pylint: disable=W0703
             except Exception as ex:
                 print("Error processing text file: {}".format(article), ex)
 
         # Filter out boilerplate elements from text
-        return Section.filtered(sections, citations)
+        return Section.filtered(sections)
 
     @staticmethod
     def files(row):
@@ -103,16 +99,15 @@ class Section(object):
         return paths
 
     @staticmethod
-    def filtered(sections, citations):
+    def filtered(sections):
         """
-        Returns a filtered list of text sections and citations. Duplicate and boilerplate text strings are removed.
+        Returns a filtered list of text sections. Duplicate and boilerplate text strings are removed.
 
         Args:
             sections: input sections
-            citations: input citations
 
         Returns:
-            filtered list of sections, citations
+            filtered list of sections
         """
 
         # Use list to preserve insertion order
@@ -129,4 +124,4 @@ class Section(object):
                 unique.append((name, text))
                 keys.add(text)
 
-        return unique, list(set(citations))
+        return unique

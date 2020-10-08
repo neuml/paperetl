@@ -7,7 +7,6 @@ import hashlib
 import os.path
 import re
 
-from collections import Counter
 from datetime import datetime
 from multiprocessing import Pool
 from dateutil import parser
@@ -16,7 +15,6 @@ from ..analysis import Study
 from ..factory import Factory
 from ..grammar import Grammar
 from ..schema.article import Article
-from ..schema.citation import Citation
 from .section import Section
 
 # Global helper for multi-processing support
@@ -143,18 +141,38 @@ class Execute(object):
         return tags
 
     @staticmethod
-    def stream(indir, models):
+    def stream(indir, models, dates, merge):
         """
         Generator that yields rows from a metadata.csv file. The directory is also included.
 
         Args:
             indir: input directory
             models: models directory
+            dates: list of uid - entry dates for current metadata file
+            merge: only merges/processes this list of uids, if enabled
         """
+
+        # Filter out duplicate ids
+        ids, hashes = set(), set()
 
         with open(os.path.join(indir, "metadata.csv"), mode="r") as csvfile:
             for row in csv.DictReader(csvfile):
-                yield (row, indir, models)
+                # cord uid
+                uid = row["cord_uid"]
+
+                # sha hash
+                sha = Execute.getHash(row)
+
+                # Only process if all conditions below met:
+                #  - Merge mode false or uid in list of ids to merge
+                #  - cord uid in entry date mapping
+                #  - cord uid and sha hash not already processed
+                if (not merge or uid in merge) and uid in dates and uid not in ids and sha not in hashes:
+                    yield (row, indir, models)
+
+                # Add uid and sha as processed
+                ids.add(uid)
+                hashes.add(sha)
 
     @staticmethod
     def process(params):
@@ -174,14 +192,11 @@ class Execute(object):
         # Unpack parameters
         row, indir, models = params
 
-        # Get sha hash
-        sha = Execute.getHash(row)
-
         # Published date
         date = Execute.getDate(row)
 
         # Get text sections
-        sections, citations = Section.parse(row, indir)
+        sections = Section.parse(row, indir)
 
         # Search recent documents for COVID-19 keywords
         tags = Execute.getTags(sections) if not date or date >= datetime(2019, 7, 1) else None
@@ -205,15 +220,12 @@ class Execute(object):
             # Extend sections with empty columns
             sections = [(name, text, None) for name, text in sections]
 
-            # Clear citations when not a tagged entry
-            citations = None
-
         # Article metadata - id, source, published, publication, authors, title, tags, design, sample size
         #                    sample section, sample method, reference
         metadata = (row["cord_uid"], row["source_x"], date, row["journal"], row["authors"], row["title"], tags, design, size,
                     sample, method, Execute.getUrl(row))
 
-        return (sha, Article(metadata, sections, None), citations)
+        return Article(metadata, sections, None)
 
     @staticmethod
     def entryDates(indir, entryfile):
@@ -225,11 +237,11 @@ class Execute(object):
             entryfile: path to entry dates file
 
         Returns:
-            dict of sha id -> entry date
+            dict of cord uid -> entry date
         """
 
-        # Entry date mapping sha id to date
-        dates = {}
+        # sha - (cord uid, date) mapping
+        entries = {}
 
         # Default path to entry files if not provided
         if not entryfile:
@@ -238,12 +250,26 @@ class Execute(object):
         # Load in memory date lookup
         with open(entryfile, mode="r") as csvfile:
             for row in csv.DictReader(csvfile):
-                dates[row["sha"]] = row["date"]
+                entries[row["sha"]] = (row["cord_uid"], row["date"])
+
+        # Reduce down to entries only in metadata
+        dates = {}
+        with open(os.path.join(indir, "metadata.csv"), mode="r") as csvfile:
+            for row in csv.DictReader(csvfile):
+                # Lookup hash
+                sha = Execute.getHash(row)
+
+                # Lookup record
+                uid, date = entries[sha]
+
+                # Store date if cord uid maps to value in entries
+                if row["cord_uid"] == uid:
+                    dates[uid] = date
 
         return dates
 
     @staticmethod
-    def run(indir, url, models, entryfile, full):
+    def run(indir, url, models, entryfile, full, merge):
         """
         Main execution method.
 
@@ -253,6 +279,7 @@ class Execute(object):
             models: model directory
             entryfile: path to entry dates file
             full: full database load if True, only loads tagged articles if False
+            merge: database url to use for merging prior results
         """
 
         print("Building articles database from {}".format(indir))
@@ -262,38 +289,33 @@ class Execute(object):
             url = os.path.join(os.path.expanduser("~"), ".cord19", "models")
             models = url
 
-        # Article, section index, database, processed ids, citations
-        db, ids, hashes, citations = Factory.create(url), set(), set(), Counter()
+        # Create database
+        db = Factory.create(url)
 
         # Load entry dates
         dates = Execute.entryDates(indir, entryfile)
 
+        # Merge existing db, if present
+        if merge:
+            merge = db.merge(merge, dates)
+            print("Merged results from existing articles database")
+
         # Create process pool
         with Pool(os.cpu_count()) as pool:
-            for sha, article, cite in pool.imap(Execute.process, Execute.stream(indir, models), 100):
+            for article in pool.imap(Execute.process, Execute.stream(indir, models, dates, merge), 100):
                 # Get unique id
                 uid = article.uid()
 
-                # Skip rows with ids/hashes that have already been processed
                 # Only load untagged rows if this is a full database load
-                if uid not in ids and sha not in hashes and (full or article.tags()):
+                if full or article.tags():
                     # Append entry date
-                    article.metadata = article.metadata + (dates[sha],)
-
-                    # Store citation reference
-                    citations.update(cite)
+                    article.metadata = article.metadata + (dates[uid],)
 
                     # Save article
                     db.save(article)
 
-                    # Store article uid as processed
-                    ids.add(uid)
-
-                    # Store article hash as processed
-                    hashes.add(sha)
-
         # Complete processing
-        db.complete([Citation(citation) for citation in citations.items()])
+        db.complete()
 
         # Commit and close
         db.close()

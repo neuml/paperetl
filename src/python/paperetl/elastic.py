@@ -25,14 +25,6 @@ class Elastic(Database):
         }
     }
 
-    # Citations index
-    CITATIONS = {
-        "settings" : {
-            "number_of_shards" : 5,
-            "number_of_replicas" : 0,
-        }
-    }
-
     def __init__(self, url):
         """
         Connects and initializes an elasticsearch instance.
@@ -50,9 +42,9 @@ class Elastic(Database):
         # Buffered actions
         self.buffer = []
 
-        # Create indices
-        self.connection.indices.create("articles", Elastic.ARTICLES)
-        self.connection.indices.create("citations", Elastic.CITATIONS)
+        # Create index if it doesn't exist
+        if not self.connection.indices.exists("articles"):
+            self.connection.indices.create("articles", Elastic.ARTICLES)
 
     def save(self, article):
         # Build article
@@ -75,36 +67,15 @@ class Elastic(Database):
 
             print("Inserted {} articles".format(self.rows), end="\r")
 
-    def complete(self, citations):
+    def complete(self):
         # Load remaining buffered articles
         if self.buffer:
             helpers.bulk(self.connection, self.buffer)
-
-        # Citation rows
-        self.buffer = []
-        if citations:
-            for citation in citations:
-                # Build citation
-                citation = citation.build()
-                citation["_index"] = "citations"
-
-                # Buffer citation
-                self.buffer.append(citation)
-
-                # Bulk load every 5000 records
-                if len(self.buffer) >= 5000:
-                    helpers.bulk(self.connection, self.buffer)
-                    self.buffer = []
-
-            # Final citation batch
-            if self.buffer:
-                helpers.bulk(self.connection, self.buffer)
 
         print("Total articles inserted: {}".format(self.rows))
 
         # Refresh indices
         self.connection.indices.refresh(index="articles")
-        self.connection.indices.refresh(index="citations")
 
     def close(self):
         self.connection.close()
