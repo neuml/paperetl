@@ -43,5 +43,5 @@ class Execute(object):
                         db.save(PDF.parse(data, f, models) if isPdf else TEI.parse(data, f, models))
 
         # Complete and close database
-        db.complete(None)
+        db.complete()
         db.close()
