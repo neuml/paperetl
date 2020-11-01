@@ -176,8 +176,8 @@ class TEI(object):
 
         # Extract text from tables
         for figure in soup.find("text").find_all("figure"):
-            # Get figure name
-            name = str(figure.contents[0])
+            # Use XML Id as figure name to ensure figures are uniquely named
+            name = figure.get("xml:id").upper()
 
             # Search for table
             table = figure.find("table")
@@ -233,7 +233,7 @@ class TEI(object):
 
         # Article metadata - id, source, published, publication, authors, title, tags, design, sample size
         #                    sample section, sample method, reference, entry date
-        metadata = (uid, "PDF", published, publication, authors, title, "PDF", design, size,
+        metadata = (uid, source, published, publication, authors, title, "PDF", design, size,
                     sample, method, reference, datetime.datetime.now().strftime("%Y-%m-%d"))
 
         return Article(metadata, sections, source)
