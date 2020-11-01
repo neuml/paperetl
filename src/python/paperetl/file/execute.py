@@ -27,6 +27,9 @@ class Execute(object):
         # Build database connection
         db = Factory.create(url)
 
+        # Processed ids
+        ids = set()
+
         # Recursively walk directory looking for files
         for root, _, files in sorted(os.walk(indir)):
             for f in sorted(files):
@@ -39,8 +42,13 @@ class Execute(object):
 
                     print("Processing: %s" % path)
                     with open(path, "rb" if isPdf else "r") as data:
-                        # Parse and save record
-                        db.save(PDF.parse(data, f, models) if isPdf else TEI.parse(data, f, models))
+                        # Parse article
+                        article = PDF.parse(data, f, models) if isPdf else TEI.parse(data, f, models)
+
+                        # Save article if unique
+                        if article.uid() not in ids:
+                            db.save(article)
+                            ids.add(article.uid())
 
         # Complete and close database
         db.complete()
