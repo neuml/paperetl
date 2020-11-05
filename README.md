@@ -61,6 +61,8 @@ Build the database:
 
 Once complete, there will be an articles.sqlite file in ~/.cord19/models
 
+See the [CORD-19 ETL](https://www.kaggle.com/davidmezzetti/cord-19-etl) notebook for a comprehensive example of paperetl in action.
+
 ### Load PDF Articles into SQLite
 The following example shows how to use paperetl to load a set of medical/scientific pdf articles into a SQLite database.
 

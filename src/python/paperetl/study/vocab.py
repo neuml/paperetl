@@ -1,12 +1,10 @@
 """
 Vocabulary module
-
-Credit to https://www.kaggle.com/savannareid for providing keywords and analysis.
 """
 
 class Vocab(object):
     """
-    Defines vocabulary terms for studies.
+    Defines vocabulary terms used to detect study design.
     """
 
     # Study titles
