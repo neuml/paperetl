@@ -1,5 +1,12 @@
 # paperetl: ETL processes for medical and scientific papers
 
+[![Version](https://img.shields.io/github/release/neuml/paperetl.svg?style=flat&color=success)](https://github.com/neuml/paperetl/releases)
+[![GitHub Release Date](https://img.shields.io/github/release-date/neuml/paperetl.svg?style=flat&color=blue)](https://github.com/neuml/paperetl/releases)
+[![GitHub issues](https://img.shields.io/github/issues/neuml/paperetl.svg?style=flat&color=success)](https://github.com/neuml/paperetl/issues)
+[![GitHub last commit](https://img.shields.io/github/last-commit/neuml/paperetl.svg?style=flat&color=blue)](https://github.com/neuml/paperetl)
+[![Build Status](https://github.com/neuml/paperetl/workflows/build/badge.svg)](https://github.com/neuml/paperetl/actions?query=workflow%3Abuild)
+[![Coverage Status](https://img.shields.io/coveralls/github/neuml/paperetl)](https://coveralls.io/github/neuml/paperetl?branch=master)
+
 paperetl is an ETL library for processing medical and scientific papers. It supports the following sources:
 
 - [CORD-19](https://www.semanticscholar.org/cord19)
