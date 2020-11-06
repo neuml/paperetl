@@ -47,16 +47,16 @@ class TestCord19(TestProcess):
         Test article metadata
         """
 
-        hashes = {"1ycj3b66": "2be5995ae9fbda2130cba228beb1793e",
-                  "2xoczdmh": "4745da2b79c0cfc40f24c368bc704ecd",
-                  "4jri92pu": "df8f6983d038445e989eb38ff12acf5d",
-                  "7u3d6nfc": "256187676ee132e311d2ce59bc3cc482",
-                  "c6nq7nli": "c77167dbc56c7be04b1cafcba759947d",
-                  "cx2h5bsw": "f669332a538979eac50d7d16214b78ef",
-                  "lnzz2chk": "4267ee7c03ed3799439c938f925b573d",
-                  "mb0qcd0b": "d218d2d0b620195c5fe709879c382b3a",
-                  "qg1ahdx5": "e52c38ca367505f02caba8bb46134aec",
-                  "uqkiglu3": "f5e914413ff4e507eff597e5a91b7c3a"}
+        hashes = {"1ycj3b66": "ecb4b2f46b10b3a55854c13feb86bc32",
+                  "2xoczdmh": "1daef2ac414a5be9b195527e973472ac",
+                  "4jri92pu": "8fe14c25c1eda20cc808005c1148c472",
+                  "7u3d6nfc": "5fabe638bb5d9fcac1b329c494094dc8",
+                  "c6nq7nli": "05e72d710f6b108e9b789420e74ad84d",
+                  "cx2h5bsw": "641beb59ffcd3107ff5b9341a4e0f115",
+                  "lnzz2chk": "525b5350f8e1b8d67629fd4ebc8733ff",
+                  "mb0qcd0b": "e791208181dda9cd650f52f08512a6fa",
+                  "qg1ahdx5": "4fb661d30ff973d1c939ea6eb0a374da",
+                  "uqkiglu3": "0b6780efa797908d9a10999853e579c8"}
 
         self.articles(hashes)
 
@@ -72,15 +72,15 @@ class TestCord19(TestProcess):
         Test section content
         """
 
-        hashes = {"1ycj3b66": "47cb6c1c32944d4c0684e1cfa6ddecb5",
-                  "2xoczdmh": "799e2149576867cfa5bab455de49e7e5",
-                  "4jri92pu": "2e277dd7caa4890db6bbadb0e72c1ccd",
-                  "7u3d6nfc": "6ef19b5e30551d1e7f7f08131bcd5fcc",
-                  "c6nq7nli": "08c18b8a901027fe8a634e6413a55eca",
-                  "cx2h5bsw": "2b0ec3ef1a07f77e59e144ffb770d8c9",
-                  "lnzz2chk": "49fcdf4be0165a54dda3f2b06d7915f3",
-                  "mb0qcd0b": "ee068155e2ee92265790da17028ff748",
-                  "qg1ahdx5": "006dea0aa9c97c5e71b06c4327addfbe",
-                  "uqkiglu3": "906a4fdd639c942e7c05192f3f48e302"}
+        hashes = {"1ycj3b66": "1ef11c012cec152fb92ad7116f16f73a",
+                  "2xoczdmh": "477bec44cbaeb545b4612934b769bbe0",
+                  "4jri92pu": "a4595820598444f82b7ae4eaab63f1a3",
+                  "7u3d6nfc": "ca54708fc11dfcd383116307d4bd9806",
+                  "c6nq7nli": "7fe5856da9211f1030a1d8768d0d7c25",
+                  "cx2h5bsw": "f22d3a4f2ddb2f3b2043c5c8cc7d4053",
+                  "lnzz2chk": "9d727c131a46eed29fea5653fc646a7f",
+                  "mb0qcd0b": "648ca163cd3006197a4683396e581584",
+                  "qg1ahdx5": "bbdd07f6171c40d161e21a52baacc3d0",
+                  "uqkiglu3": "daf55a623de742f6739a85993d3a0f9b"}
 
         self.sections(hashes)
