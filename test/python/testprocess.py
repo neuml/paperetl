@@ -36,8 +36,10 @@ class TestProcess(unittest.TestCase):
             hashes: expected hashes
         """
 
-        # Article columns except entry date
-        columns = ",".join(Article.ARTICLE[:-1])
+        # Get all article columns except published and entry date
+        columns = list(Article.ARTICLE[:-1])
+        del columns[2]
+        columns = ",".join(columns)
 
         self.cur.execute("SELECT %s FROM articles ORDER BY id" % columns)
         for row in self.cur.fetchall():

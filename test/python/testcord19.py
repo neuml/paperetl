@@ -47,16 +47,16 @@ class TestCord19(TestProcess):
         Test article metadata
         """
 
-        hashes = {"1ycj3b66": "ecb4b2f46b10b3a55854c13feb86bc32",
-                  "2xoczdmh": "1daef2ac414a5be9b195527e973472ac",
-                  "4jri92pu": "8fe14c25c1eda20cc808005c1148c472",
-                  "7u3d6nfc": "5fabe638bb5d9fcac1b329c494094dc8",
-                  "c6nq7nli": "05e72d710f6b108e9b789420e74ad84d",
-                  "cx2h5bsw": "641beb59ffcd3107ff5b9341a4e0f115",
-                  "lnzz2chk": "525b5350f8e1b8d67629fd4ebc8733ff",
-                  "mb0qcd0b": "e791208181dda9cd650f52f08512a6fa",
-                  "qg1ahdx5": "4fb661d30ff973d1c939ea6eb0a374da",
-                  "uqkiglu3": "0b6780efa797908d9a10999853e579c8"}
+        hashes = {"1ycj3b66": "a4f3d1219b1fa0be80de2792c7f97d48",
+                  "2xoczdmh": "ff2fb178a73d567bd01d4281c9dac411",
+                  "4jri92pu": "9aa014e20ab20191919156ceafb9a8a8",
+                  "7u3d6nfc": "50703188014aaadb5f0155c5fbfa4abd",
+                  "c6nq7nli": "65ef47241aaa62c8b7896d114b0c4658",
+                  "cx2h5bsw": "98f8c1c37ca25ef2a8cc121fc8a8502e",
+                  "lnzz2chk": "7ecd68424d1ff7cd53ca8ae2fa80a56c",
+                  "mb0qcd0b": "ca4c2f9ceff89c0e63bb933cc7bb5cd4",
+                  "qg1ahdx5": "ee97b9304a3dc7209392464f565d5037",
+                  "uqkiglu3": "70e5575be41cbde2c7b42edc29a454b3"}
 
         self.articles(hashes)
 

@@ -47,16 +47,16 @@ class TestFile(TestProcess):
         Test article metadata
         """
 
-        hashes = {"00398e4c637f5e5447e35e63669187f0239c0357": "bef1d093d75c0b867c6c0ecd679f0987",
-                  "00c4c8c42473d25ebb38c4a8a14200c6900be2e9": "9bfb614f0ea91f43e5fb92c0025ee0e8",
-                  "17a845a8681cca77a4497462e797172148448d7d": "1539f4740300d15596e9c04df505ed57",
-                  "1d6a755d67e76049551898de66c95f77b9420b0c": "7a3efeb9229751a4febc6eed7b48faf4",
-                  "3d2fb136bbd9bd95f86fc49bdcf5ad08ada6913b": "6721860a1deb25a7dd71992add19392f",
-                  "5ea7c57e339a078196ec69223c4681fd7a5aab8b": "5a6c7ce6811038fc774c9a8e771243d5",
-                  "6cb7a79749913fa0c2c3748cbfee2f654d5cea36": "e3d0f190d503aab89045c82e127e593c",
-                  "a09f0fcf41e01f2cdb5685b5000964797f679132": "fc754a4a00e82ad4f01194556e4f5a11",
-                  "b9f6e3d2dd7d18902ac3a538789d836793dd48b2": "5415730597346d60d73d3f993c0b82e9",
-                  "dff0088d65a56e2673d11ad2f7a180687cab6f70": "68353f688a200e51cd656dc4a7c9b349"}
+        hashes = {"00398e4c637f5e5447e35e63669187f0239c0357": "3d33d69c9000a17a458d9295ab1e7457",
+                  "00c4c8c42473d25ebb38c4a8a14200c6900be2e9": "0285f5accebeff1397fbdd5aa9ee51c4",
+                  "17a845a8681cca77a4497462e797172148448d7d": "dcedb273321b4e936bcc0c7b8b85488c",
+                  "1d6a755d67e76049551898de66c95f77b9420b0c": "0346bb2747c4d4c1e06284cdba67c5df",
+                  "3d2fb136bbd9bd95f86fc49bdcf5ad08ada6913b": "54c9504e3b83b23cdd973d501528f5be",
+                  "5ea7c57e339a078196ec69223c4681fd7a5aab8b": "e3374c8a38f198c136e553642ca4a747",
+                  "6cb7a79749913fa0c2c3748cbfee2f654d5cea36": "ff7ef702bdc5908009c37bdb6b5fd1d5",
+                  "a09f0fcf41e01f2cdb5685b5000964797f679132": "1ef532b4d24ce367f5a1600ee9c93bef",
+                  "b9f6e3d2dd7d18902ac3a538789d836793dd48b2": "4f60700131c5015cee997b7a1b74948f",
+                  "dff0088d65a56e2673d11ad2f7a180687cab6f70": "d6a6cf1830e6088b8e63fb897edc7a2c"}
 
         self.articles(hashes)
 
