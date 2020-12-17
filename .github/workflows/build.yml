@@ -17,8 +17,7 @@ jobs:
           python-version: 3.7
 
       - name: Install dependencies - Windows
-        run: |
-          choco install wget
+        run: choco install wget
         if: matrix.os == 'windows-latest'
 
       - name: Build
