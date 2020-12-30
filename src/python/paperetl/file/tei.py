@@ -176,6 +176,8 @@ class TEI(object):
                     append_text = str(e.text)
                     text_appends.append(append_text)
                 except AttributeError:
+                    # 'NavigableString' object has no attribute 'text'
+                    # https://gist.github.com/nialov/1317461ae74719b765219d22c4cd4ba2
                     continue
             text = " ".join(text_appends)
 
