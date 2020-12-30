@@ -29,7 +29,6 @@ from sklearn.ensemble import RandomForestClassifier
 from .study import StudyModel
 from .vocab import Vocab
 
-
 class Design(StudyModel):
     """
     Prediction model used to classify study designs.
@@ -56,17 +55,13 @@ class Design(StudyModel):
         return int(self.model.predict(features)[0])
 
     def create(self):
-        return RandomForestClassifier(
-            n_estimators=129, max_depth=21, max_features=0.22, random_state=0
-        )
+        return RandomForestClassifier(n_estimators=129, max_depth=21, max_features=0.22, random_state=0)
 
     def hyperparams(self):
-        return {
-            "n_estimators": range(125, 150),
-            "max_depth": range(20, 30),
-            "max_features": [x / 100 for x in range(15, 25)],
-            "random_state": (0,),
-        }
+        return {"n_estimators": range(125, 150),
+                "max_depth": range(20, 30),
+                "max_features": [x / 100 for x in range(15, 25)],
+                "random_state": (0,)}
 
     def data(self, training):
         # Unique ids
@@ -89,11 +84,7 @@ class Design(StudyModel):
             # Build id list for each uid batch
             for idlist in self.batch(list(uids.keys()), 999):
                 # Get section text and transform to features
-                cur.execute(
-                    "SELECT name, text, article FROM sections WHERE article in (%s) ORDER BY id"
-                    % ",".join(["?"] * len(idlist)),
-                    idlist,
-                )
+                cur.execute("SELECT name, text, article FROM sections WHERE article in (%s) ORDER BY id" % ",".join(["?"] * len(idlist)), idlist)
                 i, f, l = self.transform(cur.fetchall(), uids)
 
                 # Combine lists from each batch
@@ -117,7 +108,7 @@ class Design(StudyModel):
             list of lists split into batch size
         """
 
-        return [uids[x : x + size] for x in range(0, len(uids), size)]
+        return [uids[x:x + size] for x in range(0, len(uids), size)]
 
     def transform(self, rows, uids):
         """
@@ -166,26 +157,14 @@ class Design(StudyModel):
         title = title[0].lower() if title else None
 
         for keyword in Vocab.TITLE:
-            vector.append(
-                len(re.findall("\\b%s\\b" % keyword.lower(), title)) if title else 0
-            )
+            vector.append(len(re.findall("\\b%s\\b" % keyword.lower(), title)) if title else 0)
 
         # Build full text from filtered sections
-        text = [
-            text
-            for name, text, _ in sections
-            if not name or StudyModel.filter(name.lower())
-        ]
+        text = [text for name, text, _ in sections if not name or StudyModel.filter(name.lower())]
         text = " ".join(text).replace("\n", " ").lower()
 
         # Get token length across filtered sections
-        length = sum(
-            [
-                len(tokens)
-                for name, _, tokens in sections
-                if not name or StudyModel.filter(name.lower())
-            ]
-        )
+        length = sum([len(tokens) for name, _, tokens in sections if not name or StudyModel.filter(name.lower())])
 
         # Add study design term counts normalized by document length
         for keyword in self.keywords:
@@ -224,10 +203,7 @@ class Design(StudyModel):
         finally:
             db.close()
 
-
 if __name__ == "__main__":
-    Design.run(
-        sys.argv[1] if len(sys.argv) > 1 else None,
-        sys.argv[2] if len(sys.argv) > 2 else None,
-        sys.argv[3] == "1" if len(sys.argv) > 3 else False,
-    )
+    Design.run(sys.argv[1] if len(sys.argv) > 1 else None,
+               sys.argv[2] if len(sys.argv) > 2 else None,
+               sys.argv[3] == "1" if len(sys.argv) > 3 else False)

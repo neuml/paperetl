@@ -19,7 +19,6 @@ from ..text import Text
 # pylint: disable=W0603
 GRAMMAR = None
 
-
 def getGrammar():
     """
     Multiprocessing helper method. Gets (or first creates then gets) a global grammar object to
@@ -35,7 +34,6 @@ def getGrammar():
         GRAMMAR = Grammar()
 
     return GRAMMAR
-
 
 class TEI(object):
     """
@@ -57,11 +55,7 @@ class TEI(object):
         # Parse publication date
         # pylint: disable=W0702
         try:
-            published = (
-                parser.parse(published["when"])
-                if published and "when" in published.attrs
-                else None
-            )
+            published = parser.parse(published["when"]) if published and "when" in published.attrs else None
         except:
             published = None
 
@@ -113,11 +107,7 @@ class TEI(object):
             authors = TEI.authors(source)
 
             struct = soup.find("biblstruct")
-            reference = (
-                "https://doi.org/" + struct.find("idno").text
-                if struct and struct.find("idno")
-                else None
-            )
+            reference = "https://doi.org/" + struct.find("idno").text if struct and struct.find("idno") else None
         else:
             published, publication, authors, reference = None, None, None, None
 
@@ -165,9 +155,6 @@ class TEI(object):
 
         # Initialize with title and abstract text
         sections = TEI.abstract(soup, title)
-
-        if soup.find("text") is None:
-            return sections
 
         for section in soup.find("text").find_all("div", recursive=False):
             # Section name and text
@@ -243,20 +230,13 @@ class TEI(object):
         tokenslist = grammar.parse([text for _, text in sections])
 
         # Join NLP tokens with sections
-        sections = [
-            (name, text, tokenslist[x])
-            for x, (name, text) in enumerate(sections)
-            if tokenslist[x]
-        ]
+        sections = [(name, text, tokenslist[x]) for x, (name, text) in enumerate(sections) if tokenslist[x]]
 
         # Parse study design fields
         design, size, sample, method, labels = Study.parse(sections, models)
 
         # Add additional fields to each section
-        sections = [
-            (name, text, labels[x] if labels[x] else grammar.label(tokens))
-            for x, (name, text, tokens) in enumerate(sections)
-        ]
+        sections = [(name, text, labels[x] if labels[x] else grammar.label(tokens)) for x, (name, text, tokens) in enumerate(sections)]
 
         # Derive uid
         try:
@@ -271,20 +251,7 @@ class TEI(object):
 
         # Article metadata - id, source, published, publication, authors, title, tags, design, sample size
         #                    sample section, sample method, reference, entry date
-        metadata = (
-            uid,
-            source,
-            published,
-            publication,
-            authors,
-            title,
-            "PDF",
-            design,
-            size,
-            sample,
-            method,
-            reference,
-            datetime.datetime.now().strftime("%Y-%m-%d"),
-        )
+        metadata = (uid, source, published, publication, authors, title, "PDF", design, size,
+                    sample, method, reference, datetime.datetime.now().strftime("%Y-%m-%d"))
 
         return Article(metadata, sections, source)
