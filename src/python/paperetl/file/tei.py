@@ -156,30 +156,23 @@ class TEI(object):
         # Initialize with title and abstract text
         sections = TEI.abstract(soup, title)
 
+        # Verify that BeautifulSoup object has findable 'text'
+        found_texts = soup.find("text")
+        if not hasattr(found_texts, "text"):
+            return sections
+
         for section in soup.find("text").find_all("div", recursive=False):
             # Section name and text
             children = list(section.children)
 
             # Attempt to parse section header
-            if len(children) == 0:
-                name = None
-            elif not children[0].name:
+            if len(children) > 0 and not children[0].name:
                 name = str(children[0]).upper()
                 children = children[1:]
             else:
                 name = None
 
-            # text = " ".join([str(e.text) for e in children if e is not None])
-            text_appends = []
-            for e in children:
-                try:
-                    append_text = str(e.text)
-                    text_appends.append(append_text)
-                except AttributeError:
-                    # 'NavigableString' object has no attribute 'text'
-                    # https://gist.github.com/nialov/1317461ae74719b765219d22c4cd4ba2
-                    continue
-            text = " ".join(text_appends)
+            text = " ".join([str(e.text) if hasattr(e, "text") else str(e) for e in children])
 
             text = text.replace("\n", " ")
 
@@ -226,7 +219,7 @@ class TEI(object):
         published, publication, authors, reference = TEI.metadata(soup)
 
         # Parse text sections
-        sections = TEI.text(soup, title) if TEI is not None else "sections"
+        sections = TEI.text(soup, title)
 
         # Build NLP tokens for sections
         tokenslist = grammar.parse([text for _, text in sections])
@@ -241,11 +234,9 @@ class TEI(object):
         sections = [(name, text, labels[x] if labels[x] else grammar.label(tokens)) for x, (name, text, tokens) in enumerate(sections)]
 
         # Derive uid
-        try:
-            uid = hashlib.sha1(
-                title.encode("utf-8") if title else reference.encode("utf-8")
-            ).hexdigest()
-        except AttributeError:
+        if title or reference:
+            uid = hashlib.sha1(title.encode("utf-8") if title else reference.encode("utf-8")).hexdigest()
+        else:
             uid = None
 
         # Default title to source if empty

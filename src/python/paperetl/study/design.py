@@ -168,12 +168,7 @@ class Design(StudyModel):
 
         # Add study design term counts normalized by document length
         for keyword in self.keywords:
-            if length != 0:
-                vector.append(
-                    len(re.findall("\\b%s\\b" % keyword.lower(), text)) / length
-                )
-            else:
-                vector.append(1)
+            vector.append(len(re.findall("\\b%s\\b" % keyword.lower(), text)) / length)
 
         return vector
 

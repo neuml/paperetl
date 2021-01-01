@@ -8,7 +8,6 @@ from ..factory import Factory
 from .pdf import PDF
 from .tei import TEI
 
-
 class Execute(object):
     """
     Transforms and loads medical/scientific files into an articles database.
@@ -44,17 +43,11 @@ class Execute(object):
                     print("Processing: %s" % path)
                     with open(path, "rb" if isPdf else "r") as data:
                         # Parse article
-                        try:
-                            article = (
-                                PDF.parse(data, f, models)
-                                if isPdf
-                                else TEI.parse(data, f, models)
-                            )
-                        except ValueError:
-                            # Catches sklearn validation error
-                            # https://gist.github.com/nialov/6c337c748908f5d07d550114b5f0965a
-                            print(f"Failed to parse: {f}")
-                            continue
+                        article = (
+                            PDF.parse(data, f, models)
+                            if isPdf
+                            else TEI.parse(data, f, models)
+                        )
 
                         # Save article if unique
                         if article.uid() not in ids:
