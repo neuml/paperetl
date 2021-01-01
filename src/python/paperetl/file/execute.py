@@ -43,11 +43,7 @@ class Execute(object):
                     print("Processing: %s" % path)
                     with open(path, "rb" if isPdf else "r") as data:
                         # Parse article
-                        article = (
-                            PDF.parse(data, f, models)
-                            if isPdf
-                            else TEI.parse(data, f, models)
-                        )
+                        article = PDF.parse(data, f, models) if isPdf else TEI.parse(data, f, models)
 
                         # Save article if unique
                         if article.uid() not in ids:

@@ -128,9 +128,7 @@ class TEI(object):
 
         sections = [("TITLE", title)]
 
-        abstract = (
-            soup.find("abstract").text if soup.find("abstract") is not None else ""
-        )
+        abstract = soup.find("abstract").text if soup.find("abstract") is not None else ""
         if abstract:
             # Transform and clean text
             abstract = Text.transform(abstract)
@@ -156,9 +154,8 @@ class TEI(object):
         # Initialize with title and abstract text
         sections = TEI.abstract(soup, title)
 
-        # Verify that BeautifulSoup object has findable 'text'
-        found_texts = soup.find("text")
-        if not hasattr(found_texts, "text"):
+        # Verify that BeautifulSoup object is not None and has find_all method
+        if not hasattr(soup.find("text"), "find_all"):
             return sections
 
         for section in soup.find("text").find_all("div", recursive=False):
