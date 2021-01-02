@@ -46,7 +46,7 @@ class Execute(object):
                         article = PDF.parse(data, f, models) if isPdf else TEI.parse(data, f, models)
 
                         # Save article if unique
-                        if article.uid() not in ids:
+                        if article and article.uid() not in ids:
                             db.save(article)
                             ids.add(article.uid())
 

@@ -128,7 +128,7 @@ class TEI(object):
 
         sections = [("TITLE", title)]
 
-        abstract = soup.find("abstract").text if soup.find("abstract") is not None else ""
+        abstract = soup.find("abstract").text
         if abstract:
             # Transform and clean text
             abstract = Text.transform(abstract)
@@ -154,23 +154,18 @@ class TEI(object):
         # Initialize with title and abstract text
         sections = TEI.abstract(soup, title)
 
-        # Verify that BeautifulSoup object is not None and has find_all method
-        if not hasattr(soup.find("text"), "find_all"):
-            return sections
-
         for section in soup.find("text").find_all("div", recursive=False):
             # Section name and text
             children = list(section.children)
 
             # Attempt to parse section header
-            if len(children) > 0 and not children[0].name:
+            if len(children) > 1 and not children[0].name:
                 name = str(children[0]).upper()
                 children = children[1:]
             else:
                 name = None
 
             text = " ".join([str(e.text) if hasattr(e, "text") else str(e) for e in children])
-
             text = text.replace("\n", " ")
 
             # Transform and clean text
@@ -210,10 +205,15 @@ class TEI(object):
 
         soup = BeautifulSoup(stream, "lxml")
 
-        title = soup.title.text if soup.title is not None else source
+        title = soup.title.text
 
         # Extract article metadata
         published, publication, authors, reference = TEI.metadata(soup)
+
+        # Validate parsed data
+        if not title and not reference:
+            print("Failed to parse content - no unique identifier found")
+            return None
 
         # Parse text sections
         sections = TEI.text(soup, title)
@@ -231,10 +231,7 @@ class TEI(object):
         sections = [(name, text, labels[x] if labels[x] else grammar.label(tokens)) for x, (name, text, tokens) in enumerate(sections)]
 
         # Derive uid
-        if title or reference:
-            uid = hashlib.sha1(title.encode("utf-8") if title else reference.encode("utf-8")).hexdigest()
-        else:
-            uid = None
+        uid = hashlib.sha1(title.encode("utf-8") if title else reference.encode("utf-8")).hexdigest()
 
         # Default title to source if empty
         title = title if title else source
