@@ -164,10 +164,10 @@ class Execute(object):
                 sha = Execute.getHash(row)
 
                 # Only process if all conditions below met:
-                #  - Merge mode false or uid in list of ids to merge
+                #  - Merge set to None (must check for None as merge can be an empty set) or uid in list of ids to merge
                 #  - cord uid in entry date mapping
                 #  - cord uid and sha hash not already processed
-                if (not merge or uid in merge) and uid in dates and uid not in ids and sha not in hashes:
+                if (merge is None or uid in merge) and uid in dates and uid not in ids and sha not in hashes:
                     yield (row, indir, models)
 
                 # Add uid and sha as processed
