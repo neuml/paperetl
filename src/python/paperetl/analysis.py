@@ -57,6 +57,10 @@ class Study(object):
             study design fields as tuple
         """
 
+        # Return default values if sections is empty
+        if not sections:
+            return (0, None, None, None, [])
+
         # Get design models
         attribute, design = getModels(models)
 

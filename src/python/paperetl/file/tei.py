@@ -159,13 +159,13 @@ class TEI(object):
             children = list(section.children)
 
             # Attempt to parse section header
-            if not children[0].name:
+            if children and not children[0].name:
                 name = str(children[0]).upper()
                 children = children[1:]
             else:
                 name = None
 
-            text = " ".join([str(e.text) for e in children])
+            text = " ".join([str(e.text) if hasattr(e, "text") else str(e) for e in children])
             text = text.replace("\n", " ")
 
             # Transform and clean text
@@ -209,6 +209,11 @@ class TEI(object):
 
         # Extract article metadata
         published, publication, authors, reference = TEI.metadata(soup)
+
+        # Validate parsed data
+        if not title and not reference:
+            print("Failed to parse content - no unique identifier found")
+            return None
 
         # Parse text sections
         sections = TEI.text(soup, title)

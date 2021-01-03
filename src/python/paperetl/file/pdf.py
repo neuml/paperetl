@@ -27,8 +27,11 @@ class PDF(object):
             (uid, article metadata, section text, article tags, study design)
         """
 
-        # Convert PDF stream to TEI XML, parse and return object
-        return TEI.parse(PDF.convert(stream), source, models)
+        # Attempt to convert PDF to TEI XML
+        xml = PDF.convert(stream)
+
+        # Parse and return object
+        return TEI.parse(xml, source, models) if xml else None
 
     @staticmethod
     def convert(stream):
@@ -43,7 +46,12 @@ class PDF(object):
         """
 
         # Call GROBID API
-        data = requests.post("http://localhost:8070/api/processFulltextDocument", files={"input": stream}).text
+        response = requests.post("http://localhost:8070/api/processFulltextDocument", files={"input": stream})
+
+        # Validate request was successful
+        if not response.ok:
+            print("Failed to process file - %s" % (response.text))
+            return None
 
         # Wrap as StringIO
-        return StringIO(data)
+        return StringIO(response.text)
