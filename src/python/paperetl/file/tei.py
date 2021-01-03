@@ -159,7 +159,7 @@ class TEI(object):
             children = list(section.children)
 
             # Attempt to parse section header
-            if len(children) > 1 and not children[0].name:
+            if children and not children[0].name:
                 name = str(children[0]).upper()
                 children = children[1:]
             else:
