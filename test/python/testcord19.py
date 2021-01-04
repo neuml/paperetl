@@ -2,10 +2,15 @@
 CORD-19 tests
 """
 
+import os
+import shutil
 import sqlite3
+
+from datetime import datetime
 
 # pylint: disable=E0401
 from paperetl.cord19.execute import Execute
+from paperetl.factory import Factory
 
 from testprocess import TestProcess
 from utils import Utils
@@ -22,7 +27,7 @@ class TestCord19(TestProcess):
         """
 
         # Build articles database
-        Execute.run(Utils.CORD19 + "/data", Utils.CORD19 + "/models", Utils.PATH + "/study", Utils.CORD19 + "/data/entry-dates.csv", True, None)
+        Execute.run(Utils.CORD19 + "/data", Utils.CORD19 + "/models", Utils.STUDY, Utils.CORD19 + "/data/entry-dates.csv", True, None)
 
     def setUp(self):
         """
@@ -59,6 +64,71 @@ class TestCord19(TestProcess):
                   "uqkiglu3": "70e5575be41cbde2c7b42edc29a454b3"}
 
         self.articles(hashes)
+
+    def testDate(self):
+        """
+        Test article publish dates
+        """
+
+        self.assertEqual(Execute.getDate({"publish_time": "2020"}), datetime(2020, 1, 1))
+        self.assertEqual(Execute.getDate({"publish_time": "2020-10-10"}), datetime(2020, 10, 10))
+        self.assertEqual(Execute.getDate({"publish_time": "bad date"}), None)
+        self.assertEqual(Execute.getDate({"publish_time": None}), None)
+
+    def testHash(self):
+        """
+        Test article sha hashes
+        """
+
+        self.assertEqual(Execute.getHash({"sha": "47ed55bfa014cd59f58896c132c36bb0a218d11d"}), "47ed55bfa014cd59f58896c132c36bb0a218d11d")
+        self.assertEqual(Execute.getHash({"sha": None, "title": "Test title"}), "62520f1c4f656dcb5fe565a4c2bf4ce1f7d435ef")
+        self.assertEqual(Execute.getHash({"sha": "47ed55bfa014cd59f58896c132c36bb0a218d11d; abcdef"}), "47ed55bfa014cd59f58896c132c36bb0a218d11d")
+
+    def testMergeEmpty(self):
+        """
+        Test merge run with no updates
+        """
+
+        os.makedirs(Utils.CORD19 + "/merge", exist_ok=True)
+
+        # Copy existing articles.sqlite file
+        shutil.copyfile(Utils.CORD19 + "/models/articles.sqlite", Utils.CORD19 + "/merge/articles.v1.sqlite")
+
+        db = Factory.create(Utils.CORD19 + "/merge")
+
+        # Load entry dates
+        dates = Execute.entryDates(Utils.CORD19 + "/data", Utils.CORD19 + "/data/entry-dates.csv")
+
+        # Run merge process
+        merge = db.merge(Utils.CORD19 + "/merge/articles.v1.sqlite", dates)
+        db.close()
+
+        # Assert no records to merge
+        self.assertFalse(merge)
+
+    def testMergeUpdate(self):
+        """
+        Test merge run with updates
+        """
+
+        # Run merge again settings entry date to older date to ensure id is set to merge
+        db = sqlite3.connect(Utils.CORD19 + "/merge/articles.v1.sqlite")
+        db.execute("UPDATE articles SET entry='2020-01-01' WHERE id='mb0qcd0b'")
+        db.commit()
+        db.close()
+
+        # Run merge, should merge a single record
+        db = Factory.create(Utils.CORD19 + "/merge")
+
+        # Load entry dates
+        dates = Execute.entryDates(Utils.CORD19 + "/data", Utils.CORD19 + "/data/entry-dates.csv")
+
+        # Run merge process
+        merge = db.merge(Utils.CORD19 + "/merge/articles.v1.sqlite", dates)
+        db.close()
+
+        # Assert record to merge
+        self.assertEqual(merge, {"mb0qcd0b"})
 
     def testSectionCount(self):
         """

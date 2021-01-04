@@ -1,5 +1,5 @@
 """
-File tests
+File ETL to database tests
 """
 
 import sqlite3
@@ -10,9 +10,9 @@ from paperetl.file.execute import Execute
 from testprocess import TestProcess
 from utils import Utils
 
-class TestFile(TestProcess):
+class TestFileDatabase(TestProcess):
     """
-    File tests
+    File ETL to database tests
     """
 
     @classmethod
@@ -22,7 +22,7 @@ class TestFile(TestProcess):
         """
 
         # Build articles database
-        Execute.run(Utils.FILE + "/data", Utils.FILE + "/models", Utils.PATH + "/study")
+        Execute.run(Utils.FILE + "/data", Utils.FILE + "/models", Utils.STUDY)
 
     def setUp(self):
         """
