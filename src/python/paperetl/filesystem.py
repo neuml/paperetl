@@ -56,7 +56,7 @@ class JSON(FileSystem):
         return "json"
 
     def write(self, output, article):
-        json.dump(article, output)
+        json.dump(article, output, default=str)
 
 class YAML(FileSystem):
     """
