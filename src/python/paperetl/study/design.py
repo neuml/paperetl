@@ -58,8 +58,8 @@ class Design(StudyModel):
         return RandomForestClassifier(n_estimators=129, max_depth=21, max_features=0.22, random_state=0)
 
     def hyperparams(self):
-        return {"n_estimators": range(125, 150),
-                "max_depth": range(20, 30),
+        return {"n_estimators": range(125, 130),
+                "max_depth": range(20, 25),
                 "max_features": [x / 100 for x in range(15, 25)],
                 "random_state": (0,)}
 
@@ -173,14 +173,15 @@ class Design(StudyModel):
         return vector
 
     @staticmethod
-    def run(training, path, optimize):
+    def run(training, path, optimize, validate):
         """
         Trains a new model.
 
         Args:
             training: path to training file
             path: database path
-            optimize: if hyperparameter optimization should be enabled
+            optimize: optional hyperparameter grid search settings, if None optimization is skipped
+            validate: if training data should be validated through model after training
         """
 
         # Load articles database
@@ -189,7 +190,10 @@ class Design(StudyModel):
         try:
             # Train the model
             model = Design()
-            model.train((training, db), optimize)
+            model.train((training, db), optimize, validate)
+
+            # Model output path
+            path = os.path.dirname(training)
 
             # Save the model
             print("Saving model to %s" % path)
@@ -201,4 +205,5 @@ class Design(StudyModel):
 if __name__ == "__main__":
     Design.run(sys.argv[1] if len(sys.argv) > 1 else None,
                sys.argv[2] if len(sys.argv) > 2 else None,
-               sys.argv[3] == "1" if len(sys.argv) > 3 else False)
+               {"cv": int(sys.argv[3])} if len(sys.argv) > 3 else None,
+               sys.argv[4] if len(sys.argv) > 4 else False)

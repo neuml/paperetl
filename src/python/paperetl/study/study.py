@@ -90,13 +90,14 @@ class StudyModel(object):
         with open(path, "wb") as handle:
             pickle.dump(self.__dict__, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-    def train(self, training, optimize):
+    def train(self, training, optimize, validate):
         """
         Trains a new model.
 
         Args:
             training: training data
-            optimize: if hyperparameters should be optimized
+            optimize: optional hyperparameter optimization settings, if None optimization is skipped
+            validate: if training data should be validated through model after training
         """
 
         # Create model, parameters set via hyperparameter tuning
@@ -105,7 +106,8 @@ class StudyModel(object):
         # Enable hyperparameter optimization for this run
         if optimize:
             params = self.hyperparams()
-            model = GridSearchCV(model, params, cv=5, verbose=1, n_jobs=-1)
+            model = GridSearchCV(model, params, cv=optimize.get("cv", 5), verbose=optimize.get("verbose", 1),
+                                 n_jobs=optimize.get("n_jobs", -1))
 
         # Load training data
         ids, features, labels = self.data(training)
@@ -128,10 +130,11 @@ class StudyModel(object):
 
         # Test model predictions on ALL training data
         # Helps show records model is confused about within training data
-        for i, x in enumerate(features):
-            pred = model.predict([x])
-            if not np.array_equal(pred[0], labels[i]):
-                print(ids[i], labels[i], ", WRONG: ", pred)
+        if validate:
+            for i, x in enumerate(features):
+                pred = model.predict([x])
+                if not np.array_equal(pred[0], labels[i]):
+                    print(ids[i], labels[i], ", WRONG: ", pred)
 
     def score(self, features, labels):
         """

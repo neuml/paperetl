@@ -69,10 +69,10 @@ class Attribute(StudyModel):
         return OneVsRestClassifier(LogisticRegression(C=0.995, solver="lbfgs", max_iter=1000, random_state=0))
 
     def hyperparams(self):
-        return {"C": [x / 200 for x in range(100, 300)],
-                "solver": ("lbfgs", "liblinear"),
-                "max_iter": (1000,),
-                "random_state": (0,)}
+        return {"estimator__C": [x / 200 for x in range(100, 300)],
+                "estimator__solver": ("lbfgs", "liblinear"),
+                "estimator__max_iter": (1000,),
+                "estimator__random_state": (0,)}
 
     def data(self, training):
         # Features
@@ -156,19 +156,20 @@ class Attribute(StudyModel):
         return (text, vector)
 
     @staticmethod
-    def run(training, path, optimize):
+    def run(training, path, optimize, validate):
         """
         Trains a new model.
 
         Args:
             training: path to training file
             path: models path
-            optimize: if hyperparameter optimization should be enabled
+            optimize: optional hyperparameter grid search settings, if None optimization is skipped
+            validate: if training data should be validated through model after training
         """
 
         # Train the model
         model = Attribute()
-        model.train(training, optimize)
+        model.train(training, optimize, validate)
 
         # Save the model
         print("Saving model to %s" % path)
@@ -177,4 +178,5 @@ class Attribute(StudyModel):
 if __name__ == "__main__":
     Attribute.run(sys.argv[1] if len(sys.argv) > 1 else None,
                   sys.argv[2] if len(sys.argv) > 2 else None,
-                  sys.argv[3] == "1" if len(sys.argv) > 3 else False)
+                  {"cv": int(sys.argv[3])} if len(sys.argv) > 3 else None,
+                  sys.argv[4] if len(sys.argv) > 4 else False)
