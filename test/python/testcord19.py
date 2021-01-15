@@ -9,6 +9,7 @@ import sqlite3
 from datetime import datetime
 
 # pylint: disable=E0401
+from paperetl.cord19.entry import Entry
 from paperetl.cord19.execute import Execute
 from paperetl.factory import Factory
 
@@ -74,6 +75,20 @@ class TestCord19(TestProcess):
         self.assertEqual(Execute.getDate({"publish_time": "2020-10-10"}), datetime(2020, 10, 10))
         self.assertEqual(Execute.getDate({"publish_time": "bad date"}), None)
         self.assertEqual(Execute.getDate({"publish_time": None}), None)
+
+    def testEntryDates(self):
+        """
+        Test entry date file generation
+        """
+
+        Entry.run(Utils.PATH, "2020-03-27")
+
+        # Validate line count
+        count = 0
+        with open(Utils.PATH + "/entry-dates.csv") as f:
+            count = sum(1 for x in f)
+
+        self.assertEqual(count, 45351)
 
     def testHash(self):
         """

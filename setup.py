@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
     DESCRIPTION = f.read()
 
 setup(name="paperetl",
-      version="1.4.0",
+      version="1.5.0",
       author="NeuML",
       description="ETL processes for medical and scientific papers",
       long_description=DESCRIPTION,
@@ -27,6 +27,7 @@ setup(name="paperetl",
           "lxml>=4.5.0",
           "nltk>=3.5",
           "numpy>=1.18.4",
+          "pandas>=1.1.0",
           "python-dateutil>=2.8.1",
           "PyYAML>=5.3",
           "regex>=2020.5.14",
