@@ -46,25 +46,34 @@ necessary for the CORD-19 dataset.
 ### Load CORD-19 into SQLite
 The following example shows how to use paperetl to load the CORD-19 dataset into a SQLite database.
 
-Download the latest dataset on the [Allen Institute for AI CORD-19 Release Page](https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/historical_releases.html). Go to the directory with the file and run the following commands.
+1. Download the latest dataset on the [Allen Institute for AI CORD-19 Release Page](https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/historical_releases.html). Go to the directory with the file and run the following commands.
 
+    ```bash
     cd <download_path>
     tar -xvzf cord-19_$DATE.tar.gz
+    tar -xvzf $DATE/document_parses.tar.gz -P .
+    mv $DATE/metadata.csv .
+    ```
 
-Where $DATE is the yyyy-mm-dd formatted date string in the file downloaded. Once completed, there should be a file named metadata.csv and subdirectories with all json articles.
+    Where $DATE is the yyyy-mm-dd formatted date string in the file downloaded. Once completed, there should be a file named metadata.csv and a directory named document_parses.
 
-Build the database:
+2. Download study model
 
-    # Download pre-trained study design/attribute models
-    # https://www.kaggle.com/davidmezzetti/cord19-study-design/#attribute
-    # https://www.kaggle.com/davidmezzetti/cord19-study-design/#design
-    # Default location: ~/.cord19/models/attribute, ~/.cord19/models/design
+    ```bash
+    wget -N https://github.com/neuml/paperetl/releases/download/v1.2.0/study.tar.gz -P /tmp
+    tar -xvzf /tmp/study.tar.gz -C /tmp
+    mv /tmp/paperetl/study/* ~/.cord19/models
+    ```
 
-    # Download entry-dates.csv and place in <download path>
-    # https://www.kaggle.com/davidmezzetti/cord-19-article-entry-dates/output
+    The [study design model](https://www.kaggle.com/davidmezzetti/cord19-study-design) with training data can also be found on Kaggle.
 
-    # Execute the ETL process to load articles into SQLite
+3. Download [latest entry-dates.csv](https://www.kaggle.com/davidmezzetti/cord-19-article-entry-dates/output) from Kaggle and place in `download path`
+
+4. Build database
+
+    ```bash
     python -m paperetl.cord19 <download_path>
+    ```
 
 Once complete, there will be an articles.sqlite file in ~/.cord19/models
 
@@ -73,19 +82,24 @@ See the [CORD-19 ETL](https://www.kaggle.com/davidmezzetti/cord-19-etl) notebook
 ### Load PDF Articles into SQLite
 The following example shows how to use paperetl to load a set of medical/scientific pdf articles into a SQLite database.
 
-Download the desired medical/scientific articles in a local directory. For this example, it is assumed the articles are in a directory named /data/scipaper/
+1. Download the desired medical/scientific articles in a local directory. For this example, it is assumed the articles are in a directory named `/data/paperetl/data`
 
-Build the database:
+2. Download study model
 
-    # Download pre-trained study design/attribute models
-    # https://www.kaggle.com/davidmezzetti/cord19-study-design/#attribute
-    # https://www.kaggle.com/davidmezzetti/cord19-study-design/#design
-    # Default location: ~/.paperai/models/attribute, ~/.paperai/models/design
+    ```bash
+    wget -N https://github.com/neuml/paperetl/releases/download/v1.2.0/study.tar.gz -P /data
+    tar -xvzf /tmp/study.tar.gz -C /data
+    ```
 
-    # Load PDF articles into SQLite
-    python -m paperetl.file /data/scipaper ~/.paperai/models ~/.paperai/models
+    The [study design model](https://www.kaggle.com/davidmezzetti/cord19-study-design) with training data can also be found on Kaggle.
 
-Once complete, there will be an articles.sqlite file in ~/.paperai/models
+3. Build the database
+
+    ```bash
+    python -m paperetl.file /data/paperetl/data /data/paperetl/models /data/paperetl/models
+    ```
+
+Once complete, there will be an articles.sqlite file in /data/paperetl/models
 
 ### Load into Elasticsearch
 Both of the examples above also support storing data in Elasticsearch with the following changes. These examples assume Elasticsearch is running locally, change the URL to a remote server as appropriate.
@@ -96,7 +110,7 @@ CORD-19:
 
 PDF Articles:
 
-    python -m paperetl.file /scipaper/input http://localhost:9200 ~/.paperai/models
+    python -m paperetl.file /data/paperetl/data http://localhost:9200 /data/paperetl/models
 
 Once complete, there will be an articles index in elasticsearch with the metadata and full text stored.
 
@@ -105,10 +119,10 @@ paperetl can also be used to convert PDF articles into JSON or YAML files. This 
 
 JSON:
 
-    python -m paperetl.file /data/scipaper json:///data/scipaper ~/.paperai/models
+    python -m paperetl.file /data/paperetl/data json:///data/paperetl/json /data/paperetl/models
 
 YAML:
 
-    python -m paperetl.file /data/scipaper yaml:///data/scipaper ~/.paperai/models
+    python -m paperetl.file /data/paperetl/data yaml:///data/paperetl/yaml /data/paperetl/models
 
-Converted files will be stored in /data/scipaper
+Converted files will be stored in /data/paperetl
