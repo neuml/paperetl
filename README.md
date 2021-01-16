@@ -67,7 +67,14 @@ The following example shows how to use paperetl to load the CORD-19 dataset into
 
     The [study design model](https://www.kaggle.com/davidmezzetti/cord19-study-design) with training data can also be found on Kaggle.
 
-3. Download [latest entry-dates.csv](https://www.kaggle.com/davidmezzetti/cord-19-article-entry-dates/output) from Kaggle and place in `download path`
+3. Generate entry-dates.csv for this $DATE
+
+    ```bash
+    python -m paperetl.cord19.entry <download_path> $DATE
+    ```
+
+    Where $DATE is the same date as step 1 above. A version of [entry-dates.csv](https://www.kaggle.com/davidmezzetti/cord-19-article-entry-dates/output)
+    is also available on Kaggle.
 
 4. Build database
 
