@@ -43,6 +43,13 @@ necessary for the CORD-19 dataset.
 
 ## Examples
 
+### Notebooks
+
+| Notebook     |      Description      |
+|:----------|:-------------|
+| [CORD-19 Article Entry Dates](https://www.kaggle.com/davidmezzetti/cord-19-article-entry-dates) | Generates CORD-19 entry-dates.csv file |
+| [CORD-19 ETL](https://www.kaggle.com/davidmezzetti/cord-19-etl) | Builds an article.sqlite database for CORD-19 data |
+
 ### Load CORD-19 into SQLite
 The following example shows how to use paperetl to load the CORD-19 dataset into a SQLite database.
 
@@ -65,7 +72,7 @@ The following example shows how to use paperetl to load the CORD-19 dataset into
     mv /tmp/paperetl/study/* ~/.cord19/models
     ```
 
-    The [study design model](https://www.kaggle.com/davidmezzetti/cord19-study-design) with training data can also be found on Kaggle.
+    The [study design model](https://www.kaggle.com/davidmezzetti/cord19-study-design) with training data is also available on Kaggle.
 
 3. Generate entry-dates.csv for this $DATE
 
@@ -83,8 +90,6 @@ The following example shows how to use paperetl to load the CORD-19 dataset into
     ```
 
 Once complete, there will be an articles.sqlite file in ~/.cord19/models
-
-See the [CORD-19 ETL](https://www.kaggle.com/davidmezzetti/cord-19-etl) notebook for a comprehensive example of paperetl in action.
 
 ### Load PDF Articles into SQLite
 The following example shows how to use paperetl to load a set of medical/scientific pdf articles into a SQLite database.
