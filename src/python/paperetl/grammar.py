@@ -27,6 +27,9 @@ class Grammar(object):
         results = None
 
         if text:
+            # Ensure all text elements are less than nlp.max_length
+            text = [t[:self.nlp.max_length - 1] for t in text]
+
             # Run text through linguistic rules
             results = [self.applyRules(tokens) for tokens in self.nlp.pipe(text, batch_size=256)]
 
