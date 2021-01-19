@@ -198,6 +198,10 @@ class Execute(object):
         # Get text sections
         sections = Section.parse(row, indir)
 
+        for _, text in sections:
+            if len(text) >= 50000:
+                print(row["cord_uid"], text[:250])
+
         # Search recent documents for COVID-19 keywords
         tags = Execute.getTags(sections) if not date or date >= datetime(2019, 7, 1) else None
 
