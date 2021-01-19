@@ -1,11 +1,31 @@
-# paperetl: ETL processes for medical and scientific papers
+<p align="center">
+    <img src="https://raw.githubusercontent.com/neuml/paperetl/master/logo.png"/>
+</p>
 
-[![Version](https://img.shields.io/github/release/neuml/paperetl.svg?style=flat&color=success)](https://github.com/neuml/paperetl/releases)
-[![GitHub Release Date](https://img.shields.io/github/release-date/neuml/paperetl.svg?style=flat&color=blue)](https://github.com/neuml/paperetl/releases)
-[![GitHub issues](https://img.shields.io/github/issues/neuml/paperetl.svg?style=flat&color=success)](https://github.com/neuml/paperetl/issues)
-[![GitHub last commit](https://img.shields.io/github/last-commit/neuml/paperetl.svg?style=flat&color=blue)](https://github.com/neuml/paperetl)
-[![Build Status](https://github.com/neuml/paperetl/workflows/build/badge.svg)](https://github.com/neuml/paperetl/actions?query=workflow%3Abuild)
-[![Coverage Status](https://img.shields.io/coveralls/github/neuml/paperetl)](https://coveralls.io/github/neuml/paperetl?branch=master)
+<h3 align="center">
+    <p>ETL processes for medical and scientific papers</p>
+</h3>
+
+<p align="center">
+    <a href="https://github.com/neuml/paperetl/releases">
+        <img src="https://img.shields.io/github/release/neuml/paperetl.svg?style=flat&color=success" alt="Version"/>
+    </a>
+    <a href="https://github.com/neuml/paperetl/releases">
+        <img src="https://img.shields.io/github/release-date/neuml/paperetl.svg?style=flat&color=blue" alt="GitHub Release Date"/>
+    </a>
+    <a href="https://github.com/neuml/paperetl/issues">
+        <img src="https://img.shields.io/github/issues/neuml/paperetl.svg?style=flat&color=success" alt="GitHub issues"/>
+    </a>
+    <a href="https://github.com/neuml/paperetl">
+        <img src="https://img.shields.io/github/last-commit/neuml/paperetl.svg?style=flat&color=blue" alt="GitHub last commit"/>
+    </a>
+    <a href="https://github.com/neuml/paperetl/actions?query=workflow%3Abuild">
+        <img src="https://github.com/neuml/paperetl/workflows/build/badge.svg" alt="Build Status"/>
+    </a>
+    <a href="https://coveralls.io/github/neuml/paperetl?branch=master">
+        <img src="https://img.shields.io/coveralls/github/neuml/paperetl" alt="Coverage Status">
+    </a>
+</p>
 
 paperetl is an ETL library for processing medical and scientific papers. It supports the following sources:
 
@@ -20,6 +40,7 @@ paperetl supports the following databases for storing articles:
 - YAML files
 
 ## Installation
+
 The easiest way to install is via pip and PyPI
 
     pip install paperetl
@@ -31,6 +52,7 @@ You can also install paperetl directly from GitHub. Using a Python Virtual Envir
 Python 3.6+ is supported
 
 ## Additional dependencies
+
 Study design detection uses scispacy and can be installed via:
 
     pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.2.5/en_core_sci_md-0.2.5.tar.gz
@@ -45,62 +67,67 @@ necessary for the CORD-19 dataset.
 
 ### Notebooks
 
-| Notebook     |      Description      |
+| Notebook  |  Description |
 |:----------|:-------------|
 | [CORD-19 Article Entry Dates](https://www.kaggle.com/davidmezzetti/cord-19-article-entry-dates) | Generates CORD-19 entry-dates.csv file |
 | [CORD-19 ETL](https://www.kaggle.com/davidmezzetti/cord-19-etl) | Builds an article.sqlite database for CORD-19 data |
 
+### Docker
+
+
+
+
 ### Load CORD-19 into SQLite
+
 The following example shows how to use paperetl to load the CORD-19 dataset into a SQLite database.
 
-1. Download the latest dataset on the [Allen Institute for AI CORD-19 Release Page](https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/historical_releases.html). Go to the directory with the file and run the following commands.
+1. Download and extract the dataset from [Allen Institute for AI CORD-19 Release Page](https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/historical_releases.html).
 
     ```bash
-    cd <download_path>
-    tar -xvzf cord-19_$DATE.tar.gz
-    tar -xvzf $DATE/document_parses.tar.gz -P .
-    mv $DATE/metadata.csv .
+    scripts/getcord19.sh cord19/data
     ```
 
-    Where $DATE is the yyyy-mm-dd formatted date string in the file downloaded. Once completed, there should be a file named metadata.csv and a directory named document_parses.
+    The script above retrieves and unpacks the latest copy of CORD-19 into a directory named `cord19/data`. An optional second argument sets a specific date of the dataset in the format YYYY-MM-DD (ex. 2021-01-01) which defaults to the latest date.
 
-2. Download study model
+2. Download [study design model](https://github.com/neuml/paperetl/releases/download/v1.2.0/study.tar.gz)
 
     ```bash
-    wget -N https://github.com/neuml/paperetl/releases/download/v1.2.0/study.tar.gz -P /tmp
-    tar -xvzf /tmp/study.tar.gz -C /tmp
-    mv /tmp/paperetl/study/* ~/.cord19/models
+    scripts/getstudy.sh cord19/models
     ```
+
+    The script above retrieves and unpacks a copy of the study model into a directory named `cord19/models`.
 
     The [study design model](https://www.kaggle.com/davidmezzetti/cord19-study-design) with training data is also available on Kaggle.
 
-3. Generate entry-dates.csv for this $DATE
+3. Generate entry-dates.csv for current version of the dataset
 
     ```bash
-    python -m paperetl.cord19.entry <download_path> $DATE
+    python -m paperetl.cord19.entry cord19/data
     ```
 
-    Where $DATE is the same date as step 1 above. A version of [entry-dates.csv](https://www.kaggle.com/davidmezzetti/cord-19-article-entry-dates/output)
-    is also available on Kaggle.
+    An optional second argument sets a specific date of the dataset in the format YYYY-MM-DD (ex. 2021-01-01) which defaults of the latest
+    date. This should match the date used in Step 1.
+
+    A version of [entry-dates.csv](https://www.kaggle.com/davidmezzetti/cord-19-article-entry-dates/output) is also available on Kaggle.
 
 4. Build database
 
     ```bash
-    python -m paperetl.cord19 <download_path>
+    python -m paperetl.cord19 cord19/data cord19/models cord19/models
     ```
 
-Once complete, there will be an articles.sqlite file in ~/.cord19/models
+Once complete, there will be an articles.sqlite file in cord19/models
 
 ### Load PDF Articles into SQLite
+
 The following example shows how to use paperetl to load a set of medical/scientific pdf articles into a SQLite database.
 
-1. Download the desired medical/scientific articles in a local directory. For this example, it is assumed the articles are in a directory named `/data/paperetl/data`
+1. Download the desired medical/scientific articles in a local directory. For this example, it is assumed the articles are in a directory named `paperetl/data`
 
-2. Download study model
+2. Download [study design model](https://github.com/neuml/paperetl/releases/download/v1.2.0/study.tar.gz)
 
     ```bash
-    wget -N https://github.com/neuml/paperetl/releases/download/v1.2.0/study.tar.gz -P /data
-    tar -xvzf /tmp/study.tar.gz -C /data
+    scripts/getstudy.sh paperetl/models
     ```
 
     The [study design model](https://www.kaggle.com/davidmezzetti/cord19-study-design) with training data can also be found on Kaggle.
@@ -108,33 +135,35 @@ The following example shows how to use paperetl to load a set of medical/scienti
 3. Build the database
 
     ```bash
-    python -m paperetl.file /data/paperetl/data /data/paperetl/models /data/paperetl/models
+    python -m paperetl.file paperetl/data paperetl/models paperetl/models
     ```
 
-Once complete, there will be an articles.sqlite file in /data/paperetl/models
+Once complete, there will be an articles.sqlite file in paperetl/models
 
 ### Load into Elasticsearch
+
 Both of the examples above also support storing data in Elasticsearch with the following changes. These examples assume Elasticsearch is running locally, change the URL to a remote server as appropriate.
 
 CORD-19:
 
-    python -m paperetl.cord19 <download_path> http://localhost:9200
+    python -m paperetl.cord19 cord19/data http://localhost:9200
 
 PDF Articles:
 
-    python -m paperetl.file /data/paperetl/data http://localhost:9200 /data/paperetl/models
+    python -m paperetl.file paperetl/data http://localhost:9200 paperetl/models
 
 Once complete, there will be an articles index in elasticsearch with the metadata and full text stored.
 
 ### Convert PDF articles to JSON/YAML
+
 paperetl can also be used to convert PDF articles into JSON or YAML files. This is useful if the data is to be fed into another system or for manual inspection/debugging of a single file.
 
 JSON:
 
-    python -m paperetl.file /data/paperetl/data json:///data/paperetl/json /data/paperetl/models
+    python -m paperetl.file paperetl/data json://paperetl/json paperetl/models
 
 YAML:
 
-    python -m paperetl.file /data/paperetl/data yaml:///data/paperetl/yaml /data/paperetl/models
+    python -m paperetl.file paperetl/data yaml://paperetl/yaml paperetl/models
 
-Converted files will be stored in /data/paperetl
+Converted files will be stored in paperetl/(json|yaml)
