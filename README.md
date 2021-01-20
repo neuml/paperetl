@@ -53,7 +53,7 @@ You can also install paperetl directly from GitHub. Using a Python Virtual Envir
 
 Python 3.6+ is supported
 
-## Additional dependencies
+### Additional dependencies
 
 Study design detection uses scispacy and can be installed via:
 
@@ -65,6 +65,19 @@ necessary for the CORD-19 dataset.
 - [GROBID install instructions](https://grobid.readthedocs.io/en/latest/Install-Grobid/)
 - [GROBID start service](https://grobid.readthedocs.io/en/latest/Grobid-service/)
 
+### Docker
+
+A Docker image with paperetl, all dependencies and scripts pre-installed is available in this repository.
+
+Clone this git repository and run the following to start the Docker image.
+
+```bash
+docker build -t paperetl -f docker/Dockerfile .
+docker run --name paperetl --rm -i -t paperetl
+```
+
+This will bring up a paperetl command shell. Standard Docker commands can be used to copy files over or commands can be run directly in the shell to retrieve input content. All scripts in the following examples are available in this environment.
+
 ## Examples
 
 ### Notebooks
@@ -73,11 +86,6 @@ necessary for the CORD-19 dataset.
 |:----------|:-------------|
 | [CORD-19 Article Entry Dates](https://www.kaggle.com/davidmezzetti/cord-19-article-entry-dates) | Generates CORD-19 entry-dates.csv file |
 | [CORD-19 ETL](https://www.kaggle.com/davidmezzetti/cord-19-etl) | Builds an article.sqlite database for CORD-19 data |
-
-### Docker
-
-
-
 
 ### Load CORD-19 into SQLite
 
