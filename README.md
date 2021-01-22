@@ -67,9 +67,9 @@ necessary for the CORD-19 dataset.
 
 ### Docker
 
-A Docker image with paperetl, all dependencies and scripts pre-installed is available in this repository.
+A Dockerfile with commands to install paperetl, all dependencies and scripts is available in this repository.
 
-Clone this git repository and run the following to start the Docker image.
+Clone this git repository and run the following to build and run the Docker image.
 
 ```bash
 docker build -t paperetl -f docker/Dockerfile .
