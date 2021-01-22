@@ -73,7 +73,7 @@ Clone this git repository and run the following to start the Docker image.
 
 ```bash
 docker build -t paperetl -f docker/Dockerfile .
-docker run --name paperetl --rm -i -t paperetl
+docker run --name paperetl --rm -it paperetl
 ```
 
 This will bring up a paperetl command shell. Standard Docker commands can be used to copy files over or commands can be run directly in the shell to retrieve input content. All scripts in the following examples are available in this environment.
