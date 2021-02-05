@@ -2,9 +2,11 @@
 Sample module
 """
 
+import re
+
 import numpy as np
 
-from word2number import w2n
+from text2digits.text2digits import Text2Digits
 
 from .vocab import Vocab
 
@@ -64,7 +66,7 @@ class Sample(object):
         matches = [Sample.match(token, keywords) for token in tokens]
         matches = [match for match in matches if match]
 
-        return matches[0][0] if matches else None
+        return matches[0] if matches else None
 
     @staticmethod
     def match(token, keywords):
@@ -81,7 +83,17 @@ class Sample(object):
         """
 
         if token.text.lower() in keywords:
-            return [Sample.tonumber(c.text) for c in token.children if Sample.isnumber(c)]
+            matches = []
+
+            # Get all numeric sequential children and join into single number
+            for c in token.children:
+                if Sample.isnumber(c):
+                    matches.append(Sample.tonumber(c))
+                elif matches:
+                    break
+
+            if matches:
+                return "".join(matches)
 
         return None
 
@@ -115,10 +127,23 @@ class Sample(object):
             parsed token
         """
 
+        # Get text as root text with preceding (left) numeric prefixes
+        text = token.text
+        for c in reversed(list(token.lefts)):
+            if c.text.isdigit() or c.pos_ == "NUM":
+                text = "%s %s" % (c.text, text)
+            else:
+                break
+
+        # Format text for numeric parsing
+        text = text.replace(",", "")
+        text = re.sub(r"(\d+)\s+(\d+)", r"\1\2", text)
+
         try:
-            return "%d" % w2n.word_to_num(token.replace(",", ""))
+            # Convert numeric words to numbers
+            return text if text.isnumeric() else Text2Digits().convert(text)
         # pylint: disable=W0702
         except:
             pass
 
-        return token
+        return text

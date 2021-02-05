@@ -10,9 +10,12 @@ import unittest
 import spacy
 
 # pylint: disable=E0401
+from paperetl.grammar import Grammar
 from paperetl.file.execute import Execute
 from paperetl.study.attribute import Attribute
 from paperetl.study.design import Design
+from paperetl.study.sample import Sample
+from paperetl.study.vocab import Vocab
 
 from utils import Utils
 
@@ -21,7 +24,7 @@ class TestStudy(unittest.TestCase):
     Study analysis tests
     """
 
-    def setUp(self):
+    def setUp2(self):
         """
         Initialization run before each test. Opens a database connection.
         """
@@ -108,3 +111,28 @@ class TestStudy(unittest.TestCase):
         # Test prediction
         row = (None, "This is a test", "This is a test".split())
         self.assertIsNotNone(design.predict([row]))
+
+    def testSample(self):
+        """
+        Test sample size extraction
+        """
+
+        samples = ["One hundred fifty-two eligible patients were treated",
+                   "One hundred fifty two eligible patients were treated",
+                   "52000 eligible patients were treated",
+                   "52,000 eligible patients were treated",
+                   "37 studies were used with 85 patients",
+                   "Three patients were enrolled",
+                   "Of 10 224 admitted patients",
+                   "The 16 studies had 3,4 and 5 patients respectively",
+                   "Out of the twenty five hundred total patients 33 were enrolled",
+                   "Though only 54 cases have been reported to our knowledge",
+                   "Data from 33 560 adults at 10 centers"]
+
+        # Parse samples into NLP tokens
+        grammar = Grammar()
+        tokenlist = grammar.parse(samples)
+
+        # Extract sample sizes and validate
+        sizes = [Sample.find(tokens, Vocab.SAMPLE) for tokens in tokenlist]
+        self.assertEqual(sizes, ["152", "152", "52000", "52000", "37", "3", "10224", "16", "2500", "54", "33560"])

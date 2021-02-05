@@ -35,7 +35,7 @@ setup(name="paperetl",
           "scikit-learn>=0.23.1",
           "scipy>=1.4.1",
           "spacy>=2.3.2,<3.0.0",
-          "word2number>=1.1"
+          "text2digits>=0.1.0"
       ],
       classifiers=[
           "License :: OSI Approved :: Apache Software License",

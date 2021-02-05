@@ -44,7 +44,7 @@ class Vocab(object):
               r"time[\-\s]varying", "tolerability", "treatment arm", "treatment effect", "truncated", "weibull"]
 
     # Sample vocabulary
-    SAMPLE = ["articles", "cases", "children", "individuals", "men", "participants", "patients", "publications", "samples", "sequences",
+    SAMPLE = ["adults", "articles", "cases", "children", "individuals", "men", "participants", "patients", "publications", "samples", "sequences",
               "studies", "trials", "total", "women"]
 
     # Sample methods vocabulary
