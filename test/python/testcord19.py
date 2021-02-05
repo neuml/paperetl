@@ -53,7 +53,7 @@ class TestCord19(TestProcess):
         Test article metadata
         """
 
-        hashes = {"1ycj3b66": "a4f3d1219b1fa0be80de2792c7f97d48",
+        hashes = {"1ycj3b66": "053d5813239b1d269f8a07798760e611",
                   "2xoczdmh": "ff2fb178a73d567bd01d4281c9dac411",
                   "4jri92pu": "9aa014e20ab20191919156ceafb9a8a8",
                   "7u3d6nfc": "50703188014aaadb5f0155c5fbfa4abd",
@@ -157,7 +157,7 @@ class TestCord19(TestProcess):
         Test section content
         """
 
-        hashes = {"1ycj3b66": "1ef11c012cec152fb92ad7116f16f73a",
+        hashes = {"1ycj3b66": "7ca47684e0020db39d43df2dc4421c5c",
                   "2xoczdmh": "477bec44cbaeb545b4612934b769bbe0",
                   "4jri92pu": "a4595820598444f82b7ae4eaab63f1a3",
                   "7u3d6nfc": "ca54708fc11dfcd383116307d4bd9806",
