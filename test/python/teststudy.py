@@ -24,7 +24,7 @@ class TestStudy(unittest.TestCase):
     Study analysis tests
     """
 
-    def setUp2(self):
+    def setUp(self):
         """
         Initialization run before each test. Opens a database connection.
         """
