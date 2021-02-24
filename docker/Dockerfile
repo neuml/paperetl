@@ -1,4 +1,5 @@
-FROM ubuntu:18.04
+ARG BASE_IMAGE=ubuntu:18.04
+FROM $BASE_IMAGE
 LABEL maintainer="NeuML"
 LABEL repository="paperetl"
 
@@ -8,9 +9,9 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists
 
 # Install paperetl project and dependencies
-RUN ln -s /usr/bin/python3.6 /usr/bin/python && \
+RUN ln -sf /usr/bin/python3.6 /usr/bin/python && \
     python -m pip install --no-cache-dir -U pip wheel setuptools && \
-    python -m pip install --no-cache-dir paperetl scikit-learn==0.23.1 && \
+    python -m pip install --no-cache-dir paperetl spacy==2.3.2 scikit-learn==0.23.1 && \
     python -c "import nltk; nltk.download('punkt')" && \
     python -m pip install --no-cache-dir https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.2.5/en_core_sci_md-0.2.5.tar.gz
 
@@ -26,8 +27,11 @@ RUN wget https://github.com/kermitt2/grobid/archive/0.6.1.zip && \
     cp ../grobid-install/grobid-service/build/libs/grobid-service*onejar.jar ./grobid-service.jar && \
     rm -rf ~/.gradle ../grobid-install grobid-home/pdf2xml/mac-64/ grobid-home/pdf2xml/win-32/ grobid-home/pdf2xml/win-64
 
+# Cleanup build packages
+RUN apt-get -y purge openjdk-8-jdk-headless && apt-get -y autoremove
+
 # Copy paperetl scripts
-RUN mkdir scripts
+RUN mkdir -p scripts
 COPY scripts/ ./scripts/
 
 # Create start script
@@ -43,9 +47,6 @@ RUN mkdir -p cord19/data && \
 # Install study models
 RUN scripts/getstudy.sh cord19/models && \
     scripts/getstudy.sh paperetl/models
-
-# Cleanup build packages
-RUN apt-get -y purge openjdk-8-jdk-headless && apt-get -y autoremove
 
 # Start script
 ENTRYPOINT scripts/start.sh
