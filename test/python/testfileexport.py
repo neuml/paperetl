@@ -61,5 +61,5 @@ class TestFileExport(TestProcess):
                     sections += len(data["sections"])
 
         # Validate counts
-        self.assertEqual(articles, 10)
-        self.assertEqual(sections, 3592)
+        self.assertEqual(articles, 12)
+        self.assertEqual(sections, 3594)

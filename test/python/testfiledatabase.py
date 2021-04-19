@@ -40,14 +40,16 @@ class TestFileDatabase(TestProcess):
         Test number of articles
         """
 
-        self.articleCount(10)
+        self.articleCount(12)
 
     def testArticles(self):
         """
         Test article metadata
         """
 
-        hashes = {"00398e4c637f5e5447e35e63669187f0239c0357": "3d33d69c9000a17a458d9295ab1e7457",
+        hashes = {"1000": "6fe045e72f58c43e6f10275b1498cc54",
+                  "1001": "c4d0e20fc00eb09ccadaf6a6ba3d6d0d",
+                  "00398e4c637f5e5447e35e63669187f0239c0357": "3d33d69c9000a17a458d9295ab1e7457",
                   "00c4c8c42473d25ebb38c4a8a14200c6900be2e9": "0285f5accebeff1397fbdd5aa9ee51c4",
                   "17a845a8681cca77a4497462e797172148448d7d": "dcedb273321b4e936bcc0c7b8b85488c",
                   "1d6a755d67e76049551898de66c95f77b9420b0c": "0346bb2747c4d4c1e06284cdba67c5df",
@@ -65,14 +67,16 @@ class TestFileDatabase(TestProcess):
         Test number of sections
         """
 
-        self.sectionCount(3592)
+        self.sectionCount(3594)
 
     def testSections(self):
         """
         Test section content
         """
 
-        hashes = {"00398e4c637f5e5447e35e63669187f0239c0357": "d6e428814a980bdbed5f50b2669f6785",
+        hashes = {"1000": "2ab25b41ef2b0ff011fad6ed5978cb3b",
+                  "1001": "000e1842e52760c4596e6e8db3b53be8",
+                  "00398e4c637f5e5447e35e63669187f0239c0357": "d6e428814a980bdbed5f50b2669f6785",
                   "00c4c8c42473d25ebb38c4a8a14200c6900be2e9": "cfd8bf5cffec86b836e497ac4973ea05",
                   "17a845a8681cca77a4497462e797172148448d7d": "422895ced816b2686ed4ea34c62e0f3a",
                   "1d6a755d67e76049551898de66c95f77b9420b0c": "644e14e17727715a205f1f92a5d98d83",
