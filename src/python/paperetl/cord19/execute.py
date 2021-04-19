@@ -13,29 +13,9 @@ from dateutil import parser
 
 from ..analysis import Study
 from ..factory import Factory
-from ..grammar import Grammar
+from ..grammar import getGrammar
 from ..schema.article import Article
 from .section import Section
-
-# Global helper for multi-processing support
-# pylint: disable=W0603
-GRAMMAR = None
-
-def getGrammar():
-    """
-    Multiprocessing helper method. Gets (or first creates then gets) a global grammar object to
-    be accessed in a new subprocess.
-
-    Returns:
-        Grammar
-    """
-
-    global GRAMMAR
-
-    if not GRAMMAR:
-        GRAMMAR = Grammar()
-
-    return GRAMMAR
 
 class Execute(object):
     """

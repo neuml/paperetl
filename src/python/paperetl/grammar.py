@@ -4,6 +4,26 @@ Grammar module
 
 import en_core_sci_md
 
+# Global helper for multi-processing support
+# pylint: disable=W0603
+GRAMMAR = None
+
+def getGrammar():
+    """
+    Multiprocessing helper method. Gets (or first creates then gets) a global grammar object to
+    be accessed in a new subprocess.
+
+    Returns:
+        Grammar
+    """
+
+    global GRAMMAR
+
+    if not GRAMMAR:
+        GRAMMAR = Grammar()
+
+    return GRAMMAR
+
 class Grammar(object):
     """
     Linguistic processing rules applied to sentences.

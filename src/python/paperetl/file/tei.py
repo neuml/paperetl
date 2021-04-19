@@ -10,30 +10,10 @@ from dateutil import parser
 from nltk.tokenize import sent_tokenize
 
 from ..analysis import Study
-from ..grammar import Grammar
+from ..grammar import getGrammar
 from ..schema.article import Article
 from ..table import Table
 from ..text import Text
-
-# Global helper for multi-processing support
-# pylint: disable=W0603
-GRAMMAR = None
-
-def getGrammar():
-    """
-    Multiprocessing helper method. Gets (or first creates then gets) a global grammar object to
-    be accessed in a new subprocess.
-
-    Returns:
-        Grammar
-    """
-
-    global GRAMMAR
-
-    if not GRAMMAR:
-        GRAMMAR = Grammar()
-
-    return GRAMMAR
 
 class TEI(object):
     """

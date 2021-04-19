@@ -24,7 +24,7 @@ class PDF(object):
             models: path to study models
 
         Returns:
-            (uid, article metadata, section text, article tags, study design)
+            Article
         """
 
         # Attempt to convert PDF to TEI XML
