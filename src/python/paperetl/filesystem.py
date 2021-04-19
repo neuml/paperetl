@@ -28,7 +28,8 @@ class FileSystem(Database):
         self.outdir = outdir
 
     def save(self, article):
-        output = os.path.splitext(article.source if article.source else article.uid())[0] + ".%s" % self.extension()
+        output = article.uid() + ".%s" % self.extension()
+        output = "%s-%s" % (os.path.splitext(article.source)[0], output) if article.source else output
 
         with open(os.path.join(self.outdir, output), "w") as output:
             self.write(output, article.build())
