@@ -12,6 +12,7 @@ from datetime import datetime
 from urllib.request import urlretrieve
 
 import pandas as pd
+import requests
 
 from .execute import Execute
 
@@ -40,8 +41,9 @@ class Entry(object):
         if not os.path.exists(DIRECTORY):
             os.mkdir(DIRECTORY)
 
-        # Read list of dates from AI2 CORD-19 Releases page
-        dates = pd.read_html("%s/historical_releases.html" % URL)[0]["Date"].tolist()
+        # Read list of dates from AI2 CORD-19 page
+        changelog = requests.get("%s/latest/changelog" % URL)
+        dates = [line for line in changelog.text.splitlines() if re.match(r"\d{4}\-\d{2}\-\d{2}", line)]
 
         # Sort dates
         dates = sorted(dates)
