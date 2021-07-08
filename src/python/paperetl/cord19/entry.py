@@ -28,7 +28,7 @@ class Entry(object):
     @staticmethod
     def download(maxdate):
         """
-        Downloads metadata files for the last 5 days along with monthly versions. This
+        Downloads metadata files for the last day along with monthly versions. This
         method can filter to a view of entry dates for a specific day by setting the
         maxdate parameter.
 
@@ -53,12 +53,15 @@ class Entry(object):
             maxdate = datetime.strptime(maxdate, "%Y-%m-%d")
             dates = [d for d in dates if datetime.strptime(d, "%Y-%m-%d") <= maxdate]
 
+        # Last date processed
+        last = None
+
         # Reduce files down to monthly (except latest file)
         for date in dates:
             # Current date
             current = datetime.strptime(date, "%Y-%m-%d")
 
-            if date == dates[-1] or current.day == 1:
+            if date == dates[-1] or current.day == 1 or (last and current.month != last.month):
                 url = "%s/%s/metadata.csv" % (URL, date)
                 path = os.path.join(DIRECTORY, "%s.csv" % date)
                 print("Retrieving %s to %s" % (url, path))
@@ -66,6 +69,9 @@ class Entry(object):
                 # Only pull file if it's not already cached
                 if not os.path.exists(path):
                     urlretrieve(url, path)
+
+            # Keep as previous date to detect month changes
+            last = current
 
     @staticmethod
     def run(output=None, maxdate=None):
