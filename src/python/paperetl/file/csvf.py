@@ -9,7 +9,7 @@ from ..schema.article import Article
 
 class CSV(object):
     """
-    Methods transform CSVs into article objects.
+    Methods to transform CSVs into article objects.
     """
 
     #pylint: disable=W0613
