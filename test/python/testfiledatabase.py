@@ -40,7 +40,7 @@ class TestFileDatabase(TestProcess):
         Test number of articles
         """
 
-        self.articleCount(12)
+        self.articleCount(17)
 
     def testArticles(self):
         """
@@ -58,7 +58,12 @@ class TestFileDatabase(TestProcess):
                   "6cb7a79749913fa0c2c3748cbfee2f654d5cea36": "ff7ef702bdc5908009c37bdb6b5fd1d5",
                   "a09f0fcf41e01f2cdb5685b5000964797f679132": "1ef532b4d24ce367f5a1600ee9c93bef",
                   "b9f6e3d2dd7d18902ac3a538789d836793dd48b2": "4f60700131c5015cee997b7a1b74948f",
-                  "dff0088d65a56e2673d11ad2f7a180687cab6f70": "d6a6cf1830e6088b8e63fb897edc7a2c"}
+                  "dff0088d65a56e2673d11ad2f7a180687cab6f70": "d6a6cf1830e6088b8e63fb897edc7a2c",
+                  "33024096": "498a6bb5ab19795ae4f8243f18748309",
+                  "33046957": "734487f06cd1765d6f3cd8980ba91881",
+                  "33100476": "b38f08aa1694b850bf0efab9c01db89d",
+                  "33126180": "3dfe0a75a817edac9472bc10c8127a0c",
+                  "33268238": "4c6440d7532785c8486882daafbd183e"}
 
         self.articles(hashes)
 
@@ -67,7 +72,7 @@ class TestFileDatabase(TestProcess):
         Test number of sections
         """
 
-        self.sectionCount(3594)
+        self.sectionCount(3640)
 
     def testSections(self):
         """
@@ -85,6 +90,11 @@ class TestFileDatabase(TestProcess):
                   "6cb7a79749913fa0c2c3748cbfee2f654d5cea36": "d9f536cbca1abaab53682423d0b51af5",
                   "a09f0fcf41e01f2cdb5685b5000964797f679132": "f04bb10cd15dea0180e9ae610a8ada9a",
                   "b9f6e3d2dd7d18902ac3a538789d836793dd48b2": "79581ee4ec2f6b6339afba4df559c927",
-                  "dff0088d65a56e2673d11ad2f7a180687cab6f70": "d214010dbae4fff941875b4dfe57ee71"}
+                  "dff0088d65a56e2673d11ad2f7a180687cab6f70": "d214010dbae4fff941875b4dfe57ee71",
+                  "33024096": "4507f361159aa92f0b2969f2bda62183",
+                  "33046957": "555c48f3611dbb12416588fdc2551e46",
+                  "33100476": "1b70d681039f3907266df6cb934400cb",
+                  "33126180": "0d182d334545b11561271247350a0ca0",
+                  "33268238": "d46b8f96bcc6d59c2d55d5bb5c257a8b"}
 
         self.sections(hashes)

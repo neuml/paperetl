@@ -8,12 +8,28 @@ from ..factory import Factory
 
 from .csvf import CSV
 from .pdf import PDF
+from .pmb import PMB
 from .tei import TEI
 
 class Execute(object):
     """
     Transforms and loads medical/scientific files into an articles database.
     """
+
+    @staticmethod
+    def mode(source, extension):
+        """
+        Determines file open mode for source file.
+
+        Args:
+            source: text string describing stream source, can be None
+            extension: data format
+
+        Returns:
+            file open mode
+        """
+
+        return "rb" if extension == "pdf" or (source and source.lower().startswith("pubmed")) else "r"
 
     @staticmethod
     def process(stream, source, models, extension):
@@ -24,13 +40,16 @@ class Execute(object):
             stream: handle to input data stream
             source: text string describing stream source, can be None
             models: path to study models
-            format: data format
+            extension: data format
         """
 
         if extension == "pdf":
             yield PDF.parse(stream, source, models)
         elif extension == "xml":
-            yield TEI.parse(stream, source, models)
+            if source and source.lower().startswith("pubmed"):
+                yield from PMB.parse(stream, source, models)
+            else:
+                yield TEI.parse(stream, source, models)
         elif extension == "csv":
             yield from CSV.parse(stream, source, models)
 
@@ -63,7 +82,7 @@ class Execute(object):
                     path = os.path.join(root, f)
 
                     # Determine if file needs to be open in binary or text mode
-                    mode = "rb" if extension == "pdf" else "r"
+                    mode = Execute.mode(f, extension)
 
                     print("Processing: %s" % path)
                     with open(path, mode) as data:

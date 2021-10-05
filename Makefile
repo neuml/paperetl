@@ -14,8 +14,8 @@ PYTHON ?= python
 # Download test data
 data: 
 	mkdir -p /tmp/paperetl
-	wget -N https://github.com/neuml/paperetl/releases/download/v1.2.0/tests.tar.gz -P /tmp
-	wget -N https://github.com/neuml/paperetl/releases/download/v1.2.0/study.tar.gz -P /tmp
+	wget -N https://github.com/neuml/paperetl/releases/download/v1.6.0/tests.tar.gz -P /tmp
+	wget -N https://github.com/neuml/paperetl/releases/download/v1.6.0/study.tar.gz -P /tmp
 	tar -xvzf /tmp/tests.tar.gz -C /tmp
 	tar -xvzf /tmp/study.tar.gz -C /tmp
 
