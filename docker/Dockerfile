@@ -5,11 +5,11 @@ LABEL repository="paperetl"
 
 # Install required packages
 RUN apt-get update && \
-    apt-get -y --no-install-recommends install libxml2 openjdk-8-jdk-headless openjdk-8-jre-headless python3.6 python3-pip unzip wget && \
+    apt-get -y --no-install-recommends install libxml2 openjdk-8-jdk-headless openjdk-8-jre-headless python3.7 python3-pip unzip wget && \
     rm -rf /var/lib/apt/lists
 
 # Install paperetl project and dependencies
-RUN ln -sf /usr/bin/python3.6 /usr/bin/python && \
+RUN ln -sf /usr/bin/python3.7 /usr/bin/python && \
     python -m pip install --no-cache-dir -U pip wheel setuptools && \
     python -m pip install --no-cache-dir paperetl spacy==2.3.2 scikit-learn==0.23.1 && \
     python -c "import nltk; nltk.download('punkt')" && \
