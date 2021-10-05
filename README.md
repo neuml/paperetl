@@ -99,7 +99,7 @@ The following example shows how to use paperetl to load the CORD-19 dataset into
 
     The script above retrieves and unpacks the latest copy of CORD-19 into a directory named `cord19/data`. An optional second argument sets a specific date of the dataset in the format YYYY-MM-DD (ex. 2021-01-01) which defaults to the latest date.
 
-2. Download [study design model](https://github.com/neuml/paperetl/releases/download/v1.2.0/study.tar.gz)
+2. Download [study design model](https://github.com/neuml/paperetl/releases/download/v1.6.0/study.tar.gz)
 
     ```bash
     scripts/getstudy.sh cord19/models
@@ -134,7 +134,7 @@ The following example shows how to use paperetl to load a set of medical/scienti
 
 1. Download the desired medical/scientific articles in a local directory. For this example, it is assumed the articles are in a directory named `paperetl/data`
 
-2. Download [study design model](https://github.com/neuml/paperetl/releases/download/v1.2.0/study.tar.gz)
+2. Download [study design model](https://github.com/neuml/paperetl/releases/download/v1.6.0/study.tar.gz)
 
     ```bash
     scripts/getstudy.sh paperetl/models
