@@ -21,6 +21,63 @@ class TEI(object):
     """
 
     @staticmethod
+    def parse(stream, source, models):
+        """
+        Parses a TEI XML datastream and returns a processed article.
+
+        Args:
+            stream: handle to input data stream
+            source: text string describing stream source, can be None
+            models: path to study models
+
+        Returns:
+            Article
+        """
+
+        # Get grammar handle
+        grammar = getGrammar()
+
+        soup = BeautifulSoup(stream, "lxml")
+
+        title = soup.title.text
+
+        # Extract article metadata
+        published, publication, authors, reference = TEI.metadata(soup)
+
+        # Validate parsed data
+        if not title and not reference:
+            print("Failed to parse content - no unique identifier found")
+            return None
+
+        # Parse text sections
+        sections = TEI.text(soup, title)
+
+        # Build NLP tokens for sections
+        tokenslist = grammar.parse([text for _, text in sections])
+
+        # Join NLP tokens with sections
+        sections = [(name, text, tokenslist[x]) for x, (name, text) in enumerate(sections) if tokenslist[x]]
+
+        # Parse study design fields
+        design, size, sample, method, labels = Study.parse(sections, models)
+
+        # Add additional fields to each section
+        sections = [(name, text, labels[x] if labels[x] else grammar.label(tokens)) for x, (name, text, tokens) in enumerate(sections)]
+
+        # Derive uid
+        uid = hashlib.sha1(title.encode("utf-8") if title else reference.encode("utf-8")).hexdigest()
+
+        # Default title to source if empty
+        title = title if title else source
+
+        # Article metadata - id, source, published, publication, authors, title, tags, design, sample size
+        #                    sample section, sample method, reference, entry date
+        metadata = (uid, source, published, publication, authors, title, "PDF", design, size,
+                    sample, method, reference, datetime.datetime.now().strftime("%Y-%m-%d"))
+
+        return Article(metadata, sections, source)
+
+    @staticmethod
     def date(published):
         """
         Attempts to parse a publication date, if available. Otherwise, None is returned.
@@ -165,60 +222,3 @@ class TEI(object):
                 sections.extend([(name, x) for x in Table.extract(table)])
 
         return sections
-
-    @staticmethod
-    def parse(stream, source, models):
-        """
-        Parses a TEI XML datastream and returns a processed article.
-
-        Args:
-            stream: handle to input data stream
-            source: text string describing stream source, can be None
-            models: path to study models
-
-        Returns:
-            Article
-        """
-
-        # Get grammar handle
-        grammar = getGrammar()
-
-        soup = BeautifulSoup(stream, "lxml")
-
-        title = soup.title.text
-
-        # Extract article metadata
-        published, publication, authors, reference = TEI.metadata(soup)
-
-        # Validate parsed data
-        if not title and not reference:
-            print("Failed to parse content - no unique identifier found")
-            return None
-
-        # Parse text sections
-        sections = TEI.text(soup, title)
-
-        # Build NLP tokens for sections
-        tokenslist = grammar.parse([text for _, text in sections])
-
-        # Join NLP tokens with sections
-        sections = [(name, text, tokenslist[x]) for x, (name, text) in enumerate(sections) if tokenslist[x]]
-
-        # Parse study design fields
-        design, size, sample, method, labels = Study.parse(sections, models)
-
-        # Add additional fields to each section
-        sections = [(name, text, labels[x] if labels[x] else grammar.label(tokens)) for x, (name, text, tokens) in enumerate(sections)]
-
-        # Derive uid
-        uid = hashlib.sha1(title.encode("utf-8") if title else reference.encode("utf-8")).hexdigest()
-
-        # Default title to source if empty
-        title = title if title else source
-
-        # Article metadata - id, source, published, publication, authors, title, tags, design, sample size
-        #                    sample section, sample method, reference, entry date
-        metadata = (uid, source, published, publication, authors, title, "PDF", design, size,
-                    sample, method, reference, datetime.datetime.now().strftime("%Y-%m-%d"))
-
-        return Article(metadata, sections, source)
