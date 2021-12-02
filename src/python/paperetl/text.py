@@ -8,6 +8,7 @@ import re
 # pylint: disable=W0603
 PATTERN = None
 
+
 def getPattern():
     """
     Gets or builds a pre-compiled regex for cleaning text.
@@ -43,6 +44,7 @@ def getPattern():
         PATTERN = re.compile("|".join([f"({p})" for p in patterns]))
 
     return PATTERN
+
 
 class Text:
     """

@@ -8,6 +8,7 @@ import requests
 
 from .tei import TEI
 
+
 class PDF:
     """
     Methods to transform medical/scientific PDFs into article objects.
@@ -45,7 +46,9 @@ class PDF:
         """
 
         # Call GROBID API
-        response = requests.post("http://localhost:8070/api/processFulltextDocument", files={"input": stream})
+        response = requests.post(
+            "http://localhost:8070/api/processFulltextDocument", files={"input": stream}
+        )
 
         # Validate request was successful
         if not response.ok:

@@ -6,6 +6,7 @@ from .elastic import Elastic
 from .filesystem import JSON, YAML
 from .sqlite import SQLite
 
+
 class Factory:
     """
     Database Factory - creates database connections
@@ -25,11 +26,11 @@ class Factory:
 
         if url.startswith("http://"):
             return Elastic(url)
-        elif url.startswith("json://"):
+        if url.startswith("json://"):
             return JSON(url.replace("json://", ""))
-        elif url.startswith("yaml://"):
+        if url.startswith("yaml://"):
             return YAML(url.replace("yaml://", ""))
-        elif url:
+        if url:
             # If URL is present, assume it's SQLite
             return SQLite(url.replace("sqlite://", ""))
 

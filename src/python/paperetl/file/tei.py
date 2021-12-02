@@ -13,6 +13,7 @@ from ..schema.article import Article
 from ..table import Table
 from ..text import Text
 
+
 class TEI:
     """
     Methods to transform TEI (Text Encoding Initiative) XML into article objects.
@@ -47,15 +48,28 @@ class TEI:
         sections = TEI.text(soup, title)
 
         # Derive uid
-        uid = hashlib.sha1(title.encode("utf-8") if title else reference.encode("utf-8")).hexdigest()
+        uid = hashlib.sha1(
+            title.encode("utf-8") if title else reference.encode("utf-8")
+        ).hexdigest()
 
         # Default title to source if empty
         title = title if title else source
 
         # Article metadata - id, source, published, publication, authors, affiliations, affiliation, title,
         #                    tags, reference, entry date
-        metadata = (uid, source, published, publication, authors, None, None, title,
-                   "PDF", reference, datetime.datetime.now().strftime("%Y-%m-%d"))
+        metadata = (
+            uid,
+            source,
+            published,
+            publication,
+            authors,
+            None,
+            None,
+            title,
+            "PDF",
+            reference,
+            datetime.datetime.now().strftime("%Y-%m-%d"),
+        )
 
         return Article(metadata, sections, source)
 
@@ -74,7 +88,11 @@ class TEI:
         # Parse publication date
         # pylint: disable=W0702
         try:
-            published = parser.parse(published["when"]) if published and "when" in published.attrs else None
+            published = (
+                parser.parse(published["when"])
+                if published and "when" in published.attrs
+                else None
+            )
         except:
             published = None
 
@@ -126,7 +144,11 @@ class TEI:
             authors = TEI.authors(source)
 
             struct = soup.find("biblstruct")
-            reference = "https://doi.org/" + struct.find("idno").text if struct and struct.find("idno") else None
+            reference = (
+                "https://doi.org/" + struct.find("idno").text
+                if struct and struct.find("idno")
+                else None
+            )
         else:
             published, publication, authors, reference = None, None, None, None
 
@@ -184,7 +206,9 @@ class TEI:
             else:
                 name = None
 
-            text = " ".join([str(e.text) if hasattr(e, "text") else str(e) for e in children])
+            text = " ".join(
+                [str(e.text) if hasattr(e, "text") else str(e) for e in children]
+            )
             text = text.replace("\n", " ")
 
             # Transform and clean text

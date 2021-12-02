@@ -9,14 +9,26 @@ from datetime import datetime, timedelta
 
 from .database import Database
 
+
 class SQLite(Database):
     """
     Defines data structures and methods to store article content in SQLite.
     """
 
     # Articles schema
-    ARTICLE = ("id", "source", "published", "publication", "authors", "affiliations", "affiliation", "title",
-               "tags", "reference", "entry")
+    ARTICLE = (
+        "id",
+        "source",
+        "published",
+        "publication",
+        "authors",
+        "affiliations",
+        "affiliation",
+        "title",
+        "tags",
+        "reference",
+        "entry",
+    )
 
     # Articles schema
     ARTICLES = {
@@ -30,7 +42,7 @@ class SQLite(Database):
         "Title": "TEXT",
         "Tags": "TEXT",
         "Reference": "TEXT",
-        "Entry": "DATETIME"
+        "Entry": "DATETIME",
     }
 
     # Sections schema
@@ -38,7 +50,7 @@ class SQLite(Database):
         "Id": "INTEGER PRIMARY KEY",
         "Article": "TEXT",
         "Name": "TEXT",
-        "Text": "TEXT"
+        "Text": "TEXT",
     }
 
     # SQL statements
@@ -52,7 +64,9 @@ class SQLite(Database):
     MAX_ENTRY = "SELECT MAX(entry) from {name}.articles"
     LOOKUP_ARTICLE = "SELECT Id FROM {name}.articles WHERE Id=? AND Entry = ?"
     MERGE_ARTICLE = "INSERT INTO articles SELECT * FROM {name}.articles WHERE Id = ?"
-    MERGE_SECTIONS = "INSERT INTO sections SELECT * FROM {name}.sections WHERE Article=?"
+    MERGE_SECTIONS = (
+        "INSERT INTO sections SELECT * FROM {name}.sections WHERE Article=?"
+    )
     UPDATE_ENTRY = "UPDATE articles SET entry = ? WHERE Id = ?"
     ARTICLE_COUNT = "SELECT COUNT(1) FROM articles"
     SECTION_COUNT = "SELECT MAX(id) FROM sections"
@@ -123,8 +137,14 @@ class SQLite(Database):
                 self.cur.execute(SQLite.UPDATE_ENTRY, [date, uid])
 
         # Set current index positions
-        self.aindex = int(self.cur.execute(SQLite.ARTICLE_COUNT.format(name=alias)).fetchone()[0]) + 1
-        self.sindex = int(self.cur.execute(SQLite.SECTION_COUNT.format(name=alias)).fetchone()[0]) + 1
+        self.aindex = (
+            int(self.cur.execute(SQLite.ARTICLE_COUNT.format(name=alias)).fetchone()[0])
+            + 1
+        )
+        self.sindex = (
+            int(self.cur.execute(SQLite.SECTION_COUNT.format(name=alias)).fetchone()[0])
+            + 1
+        )
 
         # Commit transaction
         self.db.commit()
@@ -152,7 +172,9 @@ class SQLite(Database):
 
         for name, text in article.sections:
             # Section row - id, article, name, text
-            self.insert(SQLite.SECTIONS, "sections", (self.sindex, article.uid(), name, text))
+            self.insert(
+                SQLite.SECTIONS, "sections", (self.sindex, article.uid(), name, text)
+            )
             self.sindex += 1
 
     def complete(self):
@@ -214,9 +236,9 @@ class SQLite(Database):
 
         # Build insert prepared statement
         columns = [name for name, _ in table.items()]
-        insert = SQLite.INSERT_ROW.format(table=name,
-                                          columns=", ".join(columns),
-                                          values=("?, " * len(columns))[:-2])
+        insert = SQLite.INSERT_ROW.format(
+            table=name, columns=", ".join(columns), values=("?, " * len(columns))[:-2]
+        )
 
         try:
             # Execute insert statement

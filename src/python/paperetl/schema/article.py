@@ -2,14 +2,26 @@
 Article module.
 """
 
+
 class Article:
     """
     Article objects. Holds all metadata and text content related to an article.
     """
 
     # Articles schema
-    ARTICLE = ("id", "source", "published", "publication", "authors", "affiliations", "affiliation", "title",
-               "tags", "reference", "entry")
+    ARTICLE = (
+        "id",
+        "source",
+        "published",
+        "publication",
+        "authors",
+        "affiliations",
+        "affiliation",
+        "title",
+        "tags",
+        "reference",
+        "entry",
+    )
 
     # Sections schema
     SECTION = ("name", "text")

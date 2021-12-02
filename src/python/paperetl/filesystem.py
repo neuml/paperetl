@@ -9,6 +9,7 @@ import yaml
 
 from .database import Database
 
+
 class FileSystem(Database):
     """
     Defines data structures and methods to store articles in a filesystem directory.
@@ -29,7 +30,11 @@ class FileSystem(Database):
 
     def save(self, article):
         output = article.uid() + f".{self.extension()}"
-        output = f"{os.path.splitext(article.source)[0]}-{output}" if article.source else output
+        output = (
+            f"{os.path.splitext(article.source)[0]}-{output}"
+            if article.source
+            else output
+        )
 
         with open(os.path.join(self.outdir, output), "w", encoding="utf-8") as output:
             self.write(output, article.build())
@@ -48,6 +53,7 @@ class FileSystem(Database):
             article: article object
         """
 
+
 class JSON(FileSystem):
     """
     Defines data structures and methods to store articles as JSON files.
@@ -58,6 +64,7 @@ class JSON(FileSystem):
 
     def write(self, output, article):
         json.dump(article, output, default=str)
+
 
 class YAML(FileSystem):
     """

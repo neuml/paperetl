@@ -15,6 +15,7 @@ from ..factory import Factory
 from ..schema.article import Article
 from .section import Section
 
+
 class Execute:
     """
     Transforms and loads CORD-19 data into an articles database.
@@ -88,7 +89,7 @@ class Execute:
                 return urls[0]
 
         # Default to DOI
-        return "https://doi.org/"  + row["doi"]
+        return "https://doi.org/" + row["doi"]
 
     @staticmethod
     def getTags(sections):
@@ -103,8 +104,16 @@ class Execute:
         """
 
         # Keyword patterns to search for
-        keywords = [r"2019[\-\s]?n[\-\s]?cov", "2019 novel coronavirus", "coronavirus 2(?:019)?", r"coronavirus disease (?:20)?19",
-                    r"covid(?:[\-\s]?(?:20)?19)?", r"n\s?cov[\-\s]?2019", r"sars[\-\s]cov-?2", r"wuhan (?:coronavirus|cov|pneumonia)"]
+        keywords = [
+            r"2019[\-\s]?n[\-\s]?cov",
+            "2019 novel coronavirus",
+            "coronavirus 2(?:019)?",
+            r"coronavirus disease (?:20)?19",
+            r"covid(?:[\-\s]?(?:20)?19)?",
+            r"n\s?cov[\-\s]?2019",
+            r"sars[\-\s]cov-?2",
+            r"wuhan (?:coronavirus|cov|pneumonia)",
+        ]
 
         # Build regular expression for each keyword. Wrap term in word boundaries
         regex = "|".join([f"\\b{keyword.lower()}\\b" for keyword in keywords])
@@ -132,7 +141,9 @@ class Execute:
         # Filter out duplicate ids
         ids, hashes = set(), set()
 
-        with open(os.path.join(indir, "metadata.csv"), mode="r", encoding="utf-8") as csvfile:
+        with open(
+            os.path.join(indir, "metadata.csv"), mode="r", encoding="utf-8"
+        ) as csvfile:
             for row in csv.DictReader(csvfile):
                 # cord uid
                 uid = row["cord_uid"]
@@ -144,7 +155,12 @@ class Execute:
                 #  - Merge set to None (must check for None as merge can be an empty set) or uid in list of ids to merge
                 #  - cord uid in entry date mapping
                 #  - cord uid and sha hash not already processed
-                if (merge is None or uid in merge) and uid in dates and uid not in ids and sha not in hashes:
+                if (
+                    (merge is None or uid in merge)
+                    and uid in dates
+                    and uid not in ids
+                    and sha not in hashes
+                ):
                     yield (row, indir)
 
                 # Add uid and sha as processed
@@ -173,12 +189,26 @@ class Execute:
         sections = Section.parse(row, indir)
 
         # Search recent documents for COVID-19 keywords
-        tags = Execute.getTags(sections) if not date or date >= datetime(2019, 7, 1) else None
+        tags = (
+            Execute.getTags(sections)
+            if not date or date >= datetime(2019, 7, 1)
+            else None
+        )
 
         # Article metadata - id, source, published, publication, authors, affiliations, affiliation, title,
         #                    tags, reference
-        metadata = (row["cord_uid"], row["source_x"], date, row["journal"], row["authors"], None, None, row["title"],
-                    tags, Execute.getUrl(row))
+        metadata = (
+            row["cord_uid"],
+            row["source_x"],
+            date,
+            row["journal"],
+            row["authors"],
+            None,
+            None,
+            row["title"],
+            tags,
+            Execute.getUrl(row),
+        )
 
         return Article(metadata, sections, None)
 
@@ -209,7 +239,9 @@ class Execute:
 
         # Reduce down to entries only in metadata
         dates = {}
-        with open(os.path.join(indir, "metadata.csv"), mode="r", encoding="utf-8") as csvfile:
+        with open(
+            os.path.join(indir, "metadata.csv"), mode="r", encoding="utf-8"
+        ) as csvfile:
             for row in csv.DictReader(csvfile):
                 # Lookup hash
                 sha = Execute.getHash(row)
@@ -255,7 +287,9 @@ class Execute:
 
         # Create process pool
         with Pool(os.cpu_count()) as pool:
-            for article in pool.imap(Execute.process, Execute.stream(indir, dates, merge), 100):
+            for article in pool.imap(
+                Execute.process, Execute.stream(indir, dates, merge), 100
+            ):
                 # Get unique id
                 uid = article.uid()
 

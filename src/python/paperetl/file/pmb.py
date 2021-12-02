@@ -13,12 +13,13 @@ from nltk.tokenize import sent_tokenize
 from ..schema.article import Article
 from ..text import Text
 
+
 class PMB:
     """
     Methods to transform PubMed archive XML files into article objects.
     """
 
-    #pylint: disable=W0613
+    # pylint: disable=W0613
     @staticmethod
     def parse(stream, source, config):
         """
@@ -38,12 +39,12 @@ class PMB:
                 codes = set(line.strip() for line in f)
 
         # Parse HTML content using lxml
-        # pylint: disable=c-extension-no-member
+        # pylint: disable=c-extension-no-member,stop-iteration-return
         document = etree.iterparse(stream, events=("start", "end"))
         _, root = next(document)
 
         for event, element in document:
-            if event == 'end' and element.tag == "PubmedArticle":
+            if event == "end" and element.tag == "PubmedArticle":
                 yield PMB.process(element, source, codes)
                 root.clear()
 
@@ -91,8 +92,19 @@ class PMB:
         if len(sections) > 1 and (match or not mesh):
             # Article metadata - id, source, published, publication, authors, affiliations, affiliation, title,
             #                    tags, reference, entry date
-            metadata = (str(uid), source, published, publication, authors, affiliations, affiliation, title,
-                        tags, reference, datetime.datetime.now().strftime("%Y-%m-%d"))
+            metadata = (
+                str(uid),
+                source,
+                published,
+                publication,
+                authors,
+                affiliations,
+                affiliation,
+                title,
+                tags,
+                reference,
+                datetime.datetime.now().strftime("%Y-%m-%d"),
+            )
 
             return Article(metadata, sections, source)
 
@@ -183,7 +195,11 @@ class PMB:
             if lastname and forename:
                 authors.append(f"{lastname}, {forename}")
 
-        return ("; ".join(authors), "; ".join(dict.fromkeys(affiliations)), affiliations[-1] if affiliations else None)
+        return (
+            "; ".join(authors),
+            "; ".join(dict.fromkeys(affiliations)),
+            affiliations[-1] if affiliations else None,
+        )
 
     @staticmethod
     def mesh(citation):
@@ -197,7 +213,11 @@ class PMB:
             list of MeSH codes
         """
 
-        return [descriptor.attrib["UI"] for descriptor in citation.findall("MeshHeadingList//DescriptorName") if descriptor.attrib["UI"]]
+        return [
+            descriptor.attrib["UI"]
+            for descriptor in citation.findall("MeshHeadingList//DescriptorName")
+            if descriptor.attrib["UI"]
+        ]
 
     @staticmethod
     def sections(article, title):
@@ -280,7 +300,12 @@ class PMB:
             #   - cleaned inner text has data
             #   - no section text queued
             #   - element tag is a <b> or matches a defined section background category name
-            if not tag and ctext and not texts and (x.tag.lower() == "b" or PMB.background(ctext)):
+            if (
+                not tag
+                and ctext
+                and not texts
+                and (x.tag.lower() == "b" or PMB.background(ctext))
+            ):
                 tag = x.tag
 
             # New section if one of following:
@@ -289,10 +314,15 @@ class PMB:
             # AND
             #   - no section text
             #   - last section text element ends in period
-            if ((x.tag == tag and ctext) or (not tag and texts)) and (not texts or texts[-1].strip().endswith(".")):
+            # pylint: disable=R0916
+            if ((x.tag == tag and ctext) or (not tag and texts)) and (
+                not texts or texts[-1].strip().endswith(".")
+            ):
                 # Save previous section
                 if texts:
-                    sections.extend([(name, t) for t in sent_tokenize("".join(texts).strip())])
+                    sections.extend(
+                        [(name, t) for t in sent_tokenize("".join(texts).strip())]
+                    )
 
                 # Reset section name/texts
                 name = ctext if tag else "ABSTRACT"
@@ -327,7 +357,11 @@ class PMB:
 
         # Parsed abstract
         for element in elements:
-            name = PMB.section(element.attrib["Label"]) if "Label" in element.attrib else None
+            name = (
+                PMB.section(element.attrib["Label"])
+                if "Label" in element.attrib
+                else None
+            )
             name = name if name else "ABSTRACT"
 
             if element.text:
@@ -351,7 +385,11 @@ class PMB:
             True if the section name is a background category
         """
 
-        return [x for x in ["aim", "introduction", "background", "purpose", "objective"] if x in name.lower()]
+        return [
+            x
+            for x in ["aim", "introduction", "background", "purpose", "objective"]
+            if x in name.lower()
+        ]
 
     @staticmethod
     def section(name):

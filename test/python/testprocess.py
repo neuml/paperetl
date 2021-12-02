@@ -4,10 +4,11 @@ Generic ETL process test module
 
 import unittest
 
-# pylint: disable=E0401
 from paperetl.schema.article import Article
 
+# pylint: disable = C0411
 from utils import Utils
+
 
 class TestProcess(unittest.TestCase):
     """
@@ -41,7 +42,7 @@ class TestProcess(unittest.TestCase):
         del columns[2]
         columns = ",".join(columns)
 
-        self.cur.execute("SELECT %s FROM articles ORDER BY id" % columns)
+        self.cur.execute(f"SELECT {columns} FROM articles ORDER BY id")
         for row in self.cur.fetchall():
             # Calculate row hash
             md5 = Utils.hashtext(" ".join([str(x) for x in row]))
@@ -74,7 +75,10 @@ class TestProcess(unittest.TestCase):
         self.cur.execute("SELECT id FROM articles ORDER BY id")
         for row in self.cur.fetchall():
             # Get list of sections
-            self.cur.execute("SELECT %s FROM sections WHERE article = ? ORDER BY id" % columns, [row[0]])
+            self.cur.execute(
+                f"SELECT {columns} FROM sections WHERE article = ? ORDER BY id",
+                [row[0]],
+            )
 
             text = [str(y) for x in self.cur.fetchall() for y in x]
             md5 = Utils.hashtext(" ".join(text))

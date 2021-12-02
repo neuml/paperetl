@@ -7,11 +7,12 @@ import os
 
 import yaml
 
-# pylint: disable=E0401
 from paperetl.file.execute import Execute
 
+# pylint: disable = C0411
 from testprocess import TestProcess
 from utils import Utils
+
 
 class TestFileExport(TestProcess):
     """
@@ -44,7 +45,7 @@ class TestFileExport(TestProcess):
         output = Utils.FILE + "/models"
 
         # Build articles database
-        Execute.run(Utils.FILE + "/data", "%s://" % method + output)
+        Execute.run(Utils.FILE + "/data", f"{method}://{output}")
 
         # Count of articles/sections
         articles = 0
@@ -56,8 +57,10 @@ class TestFileExport(TestProcess):
             if os.path.isfile(path) and path.endswith(method):
                 articles += 1
 
-                with open(path) as ifile:
-                    data = yaml.safe_load(ifile) if method == "yaml" else json.load(ifile)
+                with open(path, encoding="utf-8") as ifile:
+                    data = (
+                        yaml.safe_load(ifile) if method == "yaml" else json.load(ifile)
+                    )
                     sections += len(data["sections"])
 
         # Validate counts

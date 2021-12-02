@@ -11,6 +11,7 @@ from .pdf import PDF
 from .pmb import PMB
 from .tei import TEI
 
+
 class Execute:
     """
     Transforms and loads medical/scientific files into an articles database.
@@ -29,7 +30,11 @@ class Execute:
             file open mode
         """
 
-        return "rb" if extension == "pdf" or (source and source.lower().startswith("pubmed")) else "r"
+        return (
+            "rb"
+            if extension == "pdf" or (source and source.lower().startswith("pubmed"))
+            else "r"
+        )
 
     @staticmethod
     def process(stream, source, extension, config):
@@ -77,7 +82,7 @@ class Execute:
                 extension = f.split(".")[-1].lower()
 
                 # Check if file ends with accepted extension
-                if any([extension for ext in ["csv", "pdf", "xml"]]):
+                if any(extension for ext in ["csv", "pdf", "xml"]):
                     # Build full path to file
                     path = os.path.join(root, f)
 

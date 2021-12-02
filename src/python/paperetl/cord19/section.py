@@ -11,7 +11,8 @@ from nltk.tokenize import sent_tokenize
 from ..table import Table
 from ..text import Text
 
-class Section(object):
+
+class Section:
     """
     Parses text content from JSON file sections.
     """
@@ -56,7 +57,11 @@ class Section(object):
                     # Extract text from body
                     for section in data["body_text"]:
                         # Section name and text
-                        name = section["section"].upper() if len(section["section"].strip()) > 0 else None
+                        name = (
+                            section["section"].upper()
+                            if len(section["section"].strip()) > 0
+                            else None
+                        )
                         text = section["text"].replace("\n", " ")
 
                         # Clean and transform text
@@ -68,7 +73,9 @@ class Section(object):
                     # Extract text from tables
                     for name, entry in data["ref_entries"].items():
                         if "html" in entry and entry["html"]:
-                            sections.extend([(name, x) for x in Table.parse(entry["html"])])
+                            sections.extend(
+                                [(name, x) for x in Table.parse(entry["html"])]
+                            )
 
             # pylint: disable=W0703
             except Exception as ex:
@@ -115,12 +122,16 @@ class Section(object):
         keys = set()
 
         # Boilerplate text to ignore
-        boilerplate = ["COVID-19 resource centre", "permission to make all its COVID", "WHO COVID database",
-                       "COVID-19 public health emergency response"]
+        boilerplate = [
+            "COVID-19 resource centre",
+            "permission to make all its COVID",
+            "WHO COVID database",
+            "COVID-19 public health emergency response",
+        ]
 
         for name, text in sections:
             # Add unique text that isn't boilerplate text
-            if not text in keys and not any([x in text for x in boilerplate]):
+            if not text in keys and not any(x in text for x in boilerplate):
                 unique.append((name, text))
                 keys.add(text)
 

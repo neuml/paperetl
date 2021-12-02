@@ -2,6 +2,7 @@
 Database module
 """
 
+
 class Database:
     """
     Defines data structures and methods to store article content.

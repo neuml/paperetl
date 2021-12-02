@@ -47,11 +47,11 @@ The easiest way to install is via pip and PyPI
 
     pip install paperetl
 
-You can also install paperetl directly from GitHub. Using a Python Virtual Environment is recommended.
+Python 3.6+ is supported. Using a Python [virtual environment](https://docs.python.org/3/library/venv.html) is recommended.
+
+paperetl can also be installed directly from GitHub to access the latest, unreleased features.
 
     pip install git+https://github.com/neuml/paperetl
-
-Python 3.6+ is supported
 
 ### Additional dependencies
 

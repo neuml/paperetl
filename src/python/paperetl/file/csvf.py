@@ -7,6 +7,7 @@ import datetime
 
 from ..schema.article import Article
 
+
 class CSV:
     """
     Methods to transform CSVs into article objects.
@@ -46,8 +47,19 @@ class CSV:
 
         # Article metadata - id, source, published, publication, authors, affiliations, affiliation, title,
         #                    tags, reference, entry date
-        fields = ("id", "source", "published", "publication", "authors", "affiliations", "affiliation", "title",
-                  "tags", "reference", "entry")
+        fields = (
+            "id",
+            "source",
+            "published",
+            "publication",
+            "authors",
+            "affiliations",
+            "affiliation",
+            "title",
+            "tags",
+            "reference",
+            "entry",
+        )
 
         metadata = []
         for field in fields:

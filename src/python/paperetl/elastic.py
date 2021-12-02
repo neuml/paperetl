@@ -6,6 +6,7 @@ from elasticsearch import Elasticsearch, helpers
 
 from .database import Database
 
+
 class Elastic(Database):
     """
     Defines data structures and methods to store article content in Elasticsearch.
@@ -13,16 +14,12 @@ class Elastic(Database):
 
     # Articles index
     ARTICLES = {
-        "settings" : {
-            "number_of_shards" : 5,
-            "number_of_replicas" : 0,
-            "index.mapping.nested_objects.limit": 30000
+        "settings": {
+            "number_of_shards": 5,
+            "number_of_replicas": 0,
+            "index.mapping.nested_objects.limit": 30000,
         },
-        "mappings": {
-            "properties" : {
-                "sections" : {"type" : "nested"}
-            }
-        }
+        "mappings": {"properties": {"sections": {"type": "nested"}}},
     }
 
     def __init__(self, url):
