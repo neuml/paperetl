@@ -10,33 +10,31 @@ from dateutil import parser
 from lxml import etree
 from nltk.tokenize import sent_tokenize
 
-from ..analysis import Study
-from ..grammar import getGrammar
 from ..schema.article import Article
 from ..text import Text
 
-class PMB(object):
+class PMB:
     """
     Methods to transform PubMed archive XML files into article objects.
     """
 
     #pylint: disable=W0613
     @staticmethod
-    def parse(stream, source, models):
+    def parse(stream, source, config):
         """
         Parses a XML datastream and yields processed articles.
 
         Args:
             stream: handle to input data stream
             source: text string describing stream source, can be None
-            models: path to study models
+            config: path to config directory
         """
 
         # Load MeSH filter codes if available
         codes = None
-        path = os.path.join(models, "codes")
-        if os.path.exists(path):
-            with open(os.path.join(models, "codes")) as f:
+        path = os.path.join(config, "codes") if config else None
+        if path and os.path.exists(path):
+            with open(os.path.join(config, "codes"), encoding="utf-8") as f:
                 codes = set(line.strip() for line in f)
 
         # Parse HTML content using lxml
@@ -46,26 +44,22 @@ class PMB(object):
 
         for event, element in document:
             if event == 'end' and element.tag == "PubmedArticle":
-                yield PMB.process(element, source, models, codes)
+                yield PMB.process(element, source, codes)
                 root.clear()
 
     @staticmethod
-    def process(element, source, models, codes):
+    def process(element, source, codes):
         """
         Processes a single XML article element into an Article.
 
         Args:
             element: XML element
             source: text string describing stream source, can be None
-            models: path to study models
             codes: List of MeSH codes to filter, can be None
 
         Returns:
             Article or None if Article not parsed
         """
-
-        # Get grammar handle
-        grammar = getGrammar()
 
         citation = element.find("MedlineCitation")
         article = citation.find("Article")
@@ -74,7 +68,7 @@ class PMB(object):
         # General fields
         uid = int(citation.find("PMID").text)
         source = source if source else "PMB"
-        reference = "https://pubmed.ncbi.nlm.nih.gov/%d" % uid
+        reference = f"https://pubmed.ncbi.nlm.nih.gov/{uid}"
 
         # Journal fields
         published = PMB.date(journal)
@@ -82,36 +76,23 @@ class PMB(object):
 
         # Article fields
         title = PMB.get(article, "ArticleTitle")
-        authors = PMB.authors(article)
-        design = PMB.design(article)
+        authors, affiliations, affiliation = PMB.authors(article)
 
         # MeSH codes for filtering, always match if no target MeSH codes available
         mesh = PMB.mesh(citation)
         match = [x for x in mesh if x in codes] if codes else True
 
+        # Create tags
+        tags = "; ".join(["PMB"] + mesh)
+
         # Abstract text
         sections = PMB.sections(article, title)
 
         if len(sections) > 1 and (match or not mesh):
-            # Build NLP tokens for sections
-            tokenslist = grammar.parse([text for _, text in sections])
-
-            # Join NLP tokens with sections
-            sections = [(name, text, tokenslist[x]) for x, (name, text) in enumerate(sections) if tokenslist[x]]
-
-            # Parse study design fields
-            detected, size, sample, method, labels = Study.parse(sections, models)
-
-            # Add additional fields to each section
-            sections = [(name, text, labels[x]) for x, (name, text, _) in enumerate(sections)]
-
-            # Use parsed study design if present, fallback to detected study design
-            design = design if design else detected
-
-            # Article metadata - id, source, published, publication, authors, title, tags, design, sample size
-            #                    sample section, sample method, reference, entry date
-            metadata = (str(uid), source, published, publication, authors, title, "PMB", design, size,
-                        sample, method, reference, datetime.datetime.now().strftime("%Y-%m-%d"))
+            # Article metadata - id, source, published, publication, authors, affiliations, affiliation, title,
+            #                    tags, reference, entry date
+            metadata = (str(uid), source, published, publication, authors, affiliations, affiliation, title,
+                        tags, reference, datetime.datetime.now().strftime("%Y-%m-%d"))
 
             return Article(metadata, sections, source)
 
@@ -131,7 +112,21 @@ class PMB(object):
         """
 
         element = element.find(path)
-        return element.text if element is not None else None
+        return PMB.text(element)
+
+    @staticmethod
+    def text(element):
+        """
+        Flattens elements into a single text string.
+
+        Args:
+            element: XML element
+
+        Returns:
+            string
+        """
+
+        return "".join(element.itertext()) if element is not None else None
 
     @staticmethod
     def date(journal):
@@ -165,25 +160,30 @@ class PMB(object):
     @staticmethod
     def authors(journal):
         """
-        Builds an authors string using article authors.
+        Parses authors and associated affiliations from the article.
 
         Args:
             journal: journal element
 
         Returns:
-            semicolon separated list of authors
+            (semicolon separated list of authors, semicolon separated list of affiliations, primary affiliation)
         """
 
         authors = []
+        affiliations = []
 
         for author in journal.findall("AuthorList/Author"):
             lastname = PMB.get(author, "LastName")
             forename = PMB.get(author, "ForeName")
 
-            if lastname and forename:
-                authors.append("%s, %s" % (lastname, forename))
+            # Add author affiliations
+            for affiliation in author.findall("AffiliationInfo/Affiliation"):
+                affiliations.append(PMB.text(affiliation))
 
-        return "; ".join(authors)
+            if lastname and forename:
+                authors.append(f"{lastname}, {forename}")
+
+        return ("; ".join(authors), "; ".join(dict.fromkeys(affiliations)), affiliations[-1] if affiliations else None)
 
     @staticmethod
     def mesh(citation):
@@ -198,36 +198,6 @@ class PMB(object):
         """
 
         return [descriptor.attrib["UI"] for descriptor in citation.findall("MeshHeadingList//DescriptorName") if descriptor.attrib["UI"]]
-
-    @staticmethod
-    def design(article):
-        """
-        Derives the study design type from the list of publication types.
-        See paperetl/study/design.py for label definitions.
-
-        Args:
-            article: article element
-
-        Returns:
-            int
-        """
-
-        design = 0
-        for label in article.findall("PublicationTypeList/PublicationType"):
-            label = label.text
-
-            if label in ["Systematic Review", "Meta-Analysis"]:
-                design = 1
-            if label == "Randomized Controlled Trial":
-                design = 2 if not design else design
-            if "Clinical Trial" in label or label == "Multicenter Study":
-                design = 3 if not design else design
-            if "Study" in label:
-                design = 6 if not design else design
-            if label == "Case Reports":
-                design = 8 if not design else design
-
-        return design
 
     @staticmethod
     def sections(article, title):
@@ -279,7 +249,7 @@ class PMB(object):
         """
 
         # Transform and clean text
-        text = Text.transform(element.text)
+        text = Text.transform(PMB.text(element))
 
         # No embedded sections
         return [("ABSTRACT", x) for x in sent_tokenize(text)]
@@ -362,7 +332,7 @@ class PMB(object):
 
             if element.text:
                 # Transform and clean text
-                text = Text.transform(element.text)
+                text = Text.transform(PMB.text(element))
 
                 # Split text into sentences, transform text and add to sections
                 sections.extend([(name, x) for x in sent_tokenize(text)])

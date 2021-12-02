@@ -15,18 +15,20 @@ class SQLite(Database):
     """
 
     # Articles schema
+    ARTICLE = ("id", "source", "published", "publication", "authors", "affiliations", "affiliation", "title",
+               "tags", "reference", "entry")
+
+    # Articles schema
     ARTICLES = {
         "Id": "TEXT PRIMARY KEY",
         "Source": "TEXT",
         "Published": "DATETIME",
         "Publication": "TEXT",
         "Authors": "TEXT",
+        "Affiliations": "TEXT",
+        "Affiliation": "TEXT",
         "Title": "TEXT",
         "Tags": "TEXT",
-        "Design": "INTEGER",
-        "Size": "TEXT",
-        "Sample": "TEXT",
-        "Method": "TEXT",
         "Reference": "TEXT",
         "Entry": "DATETIME"
     }
@@ -35,11 +37,8 @@ class SQLite(Database):
     SECTIONS = {
         "Id": "INTEGER PRIMARY KEY",
         "Article": "TEXT",
-        "Tags": "TEXT",
-        "Design": "INTEGER",
         "Name": "TEXT",
-        "Text": "TEXT",
-        "Labels": "TEXT"
+        "Text": "TEXT"
     }
 
     # SQL statements
@@ -146,18 +145,18 @@ class SQLite(Database):
         # Increment number of articles processed
         self.aindex += 1
         if self.aindex % 1000 == 0:
-            print("Inserted {} articles".format(self.aindex), end="\r")
+            print(f"Inserted {self.aindex} articles", end="\r")
 
             # Commit current transaction and start a new one
             self.transaction()
 
-        for name, text, labels in article.sections:
-            # Section row - id, article, tags, design, name, text, labels
-            self.insert(SQLite.SECTIONS, "sections", (self.sindex, article.uid(), article.tags(), article.design(), name, text, labels))
+        for name, text in article.sections:
+            # Section row - id, article, name, text
+            self.insert(SQLite.SECTIONS, "sections", (self.sindex, article.uid(), name, text))
             self.sindex += 1
 
     def complete(self):
-        print("Total articles inserted: {}".format(self.aindex))
+        print(f"Total articles inserted: {self.aindex}")
 
         # Create articles index for sections table
         self.execute(SQLite.CREATE_INDEX)
@@ -183,7 +182,7 @@ class SQLite(Database):
             name: table name
         """
 
-        columns = ["{0} {1}".format(name, ctype) for name, ctype in table.items()]
+        columns = [f"{name} {ctype}" for name, ctype in table.items()]
         create = SQLite.CREATE_TABLE.format(table=name, fields=", ".join(columns))
 
         # pylint: disable=W0703
@@ -224,7 +223,7 @@ class SQLite(Database):
             self.cur.execute(insert, self.values(table, row, columns))
         # pylint: disable=W0703
         except Exception as ex:
-            print("Error inserting row: {}".format(row), ex)
+            print(f"Error inserting row: {row}", ex)
 
     def values(self, table, row, columns):
         """

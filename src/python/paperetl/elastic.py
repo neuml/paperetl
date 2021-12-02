@@ -65,14 +65,14 @@ class Elastic(Database):
             helpers.bulk(self.connection, self.buffer)
             self.buffer = []
 
-            print("Inserted {} articles".format(self.rows), end="\r")
+            print(f"Inserted {self.rows} articles", end="\r")
 
     def complete(self):
         # Load remaining buffered articles
         if self.buffer:
             helpers.bulk(self.connection, self.buffer)
 
-        print("Total articles inserted: {}".format(self.rows))
+        print(f"Total articles inserted: {self.rows}")
 
         # Refresh indices
         self.connection.indices.refresh(index="articles")

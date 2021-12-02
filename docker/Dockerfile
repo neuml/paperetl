@@ -11,9 +11,8 @@ RUN apt-get update && \
 # Install paperetl project and dependencies
 RUN ln -sf /usr/bin/python3.7 /usr/bin/python && \
     python -m pip install --no-cache-dir -U pip wheel setuptools && \
-    python -m pip install --no-cache-dir paperetl spacy==2.3.2 scikit-learn==0.23.1 && \
-    python -c "import nltk; nltk.download('punkt')" && \
-    python -m pip install --no-cache-dir https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.2.5/en_core_sci_md-0.2.5.tar.gz
+    python -m pip install --no-cache-dir paperetl && \
+    python -c "import nltk; nltk.download('punkt')"
 
 # Install GROBID
 # This method builds a trimmed down standalone service. A much simpler method is unzipping then running:
@@ -43,10 +42,6 @@ RUN echo "#!/bin/bash" > scripts/start.sh && \
 # Create paperetl directories
 RUN mkdir -p cord19/data && \
     mkdir -p paperetl/data
-
-# Install study models
-RUN scripts/getstudy.sh cord19/models && \
-    scripts/getstudy.sh paperetl/models
 
 # Start script
 ENTRYPOINT scripts/start.sh

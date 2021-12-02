@@ -22,7 +22,7 @@ class TestFileDatabase(TestProcess):
         """
 
         # Build articles database
-        Execute.run(Utils.FILE + "/data", Utils.FILE + "/models", Utils.STUDY)
+        Execute.run(Utils.FILE + "/data", Utils.FILE + "/models")
 
     def setUp(self):
         """
@@ -47,23 +47,23 @@ class TestFileDatabase(TestProcess):
         Test article metadata
         """
 
-        hashes = {"1000": "6fe045e72f58c43e6f10275b1498cc54",
-                  "1001": "c4d0e20fc00eb09ccadaf6a6ba3d6d0d",
-                  "00398e4c637f5e5447e35e63669187f0239c0357": "3d33d69c9000a17a458d9295ab1e7457",
-                  "00c4c8c42473d25ebb38c4a8a14200c6900be2e9": "0285f5accebeff1397fbdd5aa9ee51c4",
-                  "17a845a8681cca77a4497462e797172148448d7d": "dcedb273321b4e936bcc0c7b8b85488c",
-                  "1d6a755d67e76049551898de66c95f77b9420b0c": "0346bb2747c4d4c1e06284cdba67c5df",
-                  "3d2fb136bbd9bd95f86fc49bdcf5ad08ada6913b": "54c9504e3b83b23cdd973d501528f5be",
-                  "5ea7c57e339a078196ec69223c4681fd7a5aab8b": "e3374c8a38f198c136e553642ca4a747",
-                  "6cb7a79749913fa0c2c3748cbfee2f654d5cea36": "ff7ef702bdc5908009c37bdb6b5fd1d5",
-                  "a09f0fcf41e01f2cdb5685b5000964797f679132": "1ef532b4d24ce367f5a1600ee9c93bef",
-                  "b9f6e3d2dd7d18902ac3a538789d836793dd48b2": "4f60700131c5015cee997b7a1b74948f",
-                  "dff0088d65a56e2673d11ad2f7a180687cab6f70": "d6a6cf1830e6088b8e63fb897edc7a2c",
-                  "33024096": "498a6bb5ab19795ae4f8243f18748309",
-                  "33046957": "734487f06cd1765d6f3cd8980ba91881",
-                  "33100476": "b38f08aa1694b850bf0efab9c01db89d",
-                  "33126180": "3dfe0a75a817edac9472bc10c8127a0c",
-                  "33268238": "4c6440d7532785c8486882daafbd183e"}
+        hashes = {"00398e4c637f5e5447e35e63669187f0239c0357": "e4bab29931654fbf2569fe88c9947138",
+                  "00c4c8c42473d25ebb38c4a8a14200c6900be2e9": "8a9deb80f42173aa0681d7607925c63b",
+                  "1000": "babc1842c2dd9bf298bf6376a1b58318",
+                  "1001": "d8579348f06c6428565cab60ef797d0d",
+                  "17a845a8681cca77a4497462e797172148448d7d": "8b5e4696e66934afe75e1d9d14aeb445",
+                  "1d6a755d67e76049551898de66c95f77b9420b0c": "b1cac46801d2dd58ec2df9ce14986af2",
+                  "33024096": "c6d63a5a2761519f31cff6f690b9f639",
+                  "33046957": "62634d987e1d5077f9892a059fec8302",
+                  "33100476": "ba7c2509e242b2132d32baa48a1dc2ed",
+                  "33126180": "d8fe2cb1d95ddf74d79e6a5e2c58bd07",
+                  "33268238": "3f0f851d08c0138d9946db1641a5278e",
+                  "3d2fb136bbd9bd95f86fc49bdcf5ad08ada6913b": "3facd9a50cf7a0e038ed0e6b3903a8b0",
+                  "5ea7c57e339a078196ec69223c4681fd7a5aab8b": "3251a20e067e1bd5291e56e9cb20218e",
+                  "6cb7a79749913fa0c2c3748cbfee2f654d5cea36": "d14bebf4a6f4103498b02b5604649619",
+                  "a09f0fcf41e01f2cdb5685b5000964797f679132": "ef24259c459d09612d0e6d4430b3e8bd",
+                  "b9f6e3d2dd7d18902ac3a538789d836793dd48b2": "60bb318db90bfb305b2343c54242d689",
+                  "dff0088d65a56e2673d11ad2f7a180687cab6f70": "4fc1512bbceb439fd4ff4a7132b08735"}
 
         self.articles(hashes)
 
@@ -72,29 +72,29 @@ class TestFileDatabase(TestProcess):
         Test number of sections
         """
 
-        self.sectionCount(3640)
+        self.sectionCount(3646)
 
     def testSections(self):
         """
         Test section content
         """
 
-        hashes = {"1000": "2ab25b41ef2b0ff011fad6ed5978cb3b",
-                  "1001": "000e1842e52760c4596e6e8db3b53be8",
-                  "00398e4c637f5e5447e35e63669187f0239c0357": "d6e428814a980bdbed5f50b2669f6785",
-                  "00c4c8c42473d25ebb38c4a8a14200c6900be2e9": "cfd8bf5cffec86b836e497ac4973ea05",
-                  "17a845a8681cca77a4497462e797172148448d7d": "422895ced816b2686ed4ea34c62e0f3a",
-                  "1d6a755d67e76049551898de66c95f77b9420b0c": "644e14e17727715a205f1f92a5d98d83",
-                  "3d2fb136bbd9bd95f86fc49bdcf5ad08ada6913b": "a3429b2fce7efa296282cf8923a37fe6",
-                  "5ea7c57e339a078196ec69223c4681fd7a5aab8b": "4ec8a19839db5adf64c50b250d8c1081",
-                  "6cb7a79749913fa0c2c3748cbfee2f654d5cea36": "d9f536cbca1abaab53682423d0b51af5",
-                  "a09f0fcf41e01f2cdb5685b5000964797f679132": "f04bb10cd15dea0180e9ae610a8ada9a",
-                  "b9f6e3d2dd7d18902ac3a538789d836793dd48b2": "79581ee4ec2f6b6339afba4df559c927",
-                  "dff0088d65a56e2673d11ad2f7a180687cab6f70": "d214010dbae4fff941875b4dfe57ee71",
-                  "33024096": "4507f361159aa92f0b2969f2bda62183",
-                  "33046957": "555c48f3611dbb12416588fdc2551e46",
-                  "33100476": "1b70d681039f3907266df6cb934400cb",
-                  "33126180": "0d182d334545b11561271247350a0ca0",
-                  "33268238": "d46b8f96bcc6d59c2d55d5bb5c257a8b"}
+        hashes = {"00398e4c637f5e5447e35e63669187f0239c0357": "cd5548d4c6dc551429b9544edfc1d40a",
+                  "00c4c8c42473d25ebb38c4a8a14200c6900be2e9": "fe8778439a5aa68fe48f0bfbcc48d021",
+                  "1000": "2a2708e0a5e9847955bb7b441a4f7ea4",
+                  "1001": "147aca4eade4737a7a1d438a5a1d3ed1",
+                  "17a845a8681cca77a4497462e797172148448d7d": "8c50748e74883ac316d2473cf491d4e0",
+                  "1d6a755d67e76049551898de66c95f77b9420b0c": "799d21a7c67b5b4777effb2c83a42ff4",
+                  "33024096": "485b6035e1cd62e5ded8c356acc5689f",
+                  "33046957": "1e7833214fc60b89316f3680e9f93ec1",
+                  "33100476": "a5db58cd71ba75e76fa8df24e3336db6",
+                  "33126180": "e9d4cf8db964421780ff8e2946461980",
+                  "33268238": "1077e7a114d54bdf80de5d6834fdeb63",
+                  "3d2fb136bbd9bd95f86fc49bdcf5ad08ada6913b": "1fc2ccc509b2bd7eca33858c740e54c2",
+                  "5ea7c57e339a078196ec69223c4681fd7a5aab8b": "e2e28cb740520bae95acd373a6c767a9",
+                  "6cb7a79749913fa0c2c3748cbfee2f654d5cea36": "2387f11ea786cc4265c54f096080ad00",
+                  "a09f0fcf41e01f2cdb5685b5000964797f679132": "78596af571f3250057c1df23eabfc498",
+                  "b9f6e3d2dd7d18902ac3a538789d836793dd48b2": "51d5b0cf2273a687a348502c95c6dbec",
+                  "dff0088d65a56e2673d11ad2f7a180687cab6f70": "c61df238a8ecb9a63422f19b2218949d"}
 
         self.sections(hashes)

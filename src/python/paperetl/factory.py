@@ -6,7 +6,7 @@ from .elastic import Elastic
 from .filesystem import JSON, YAML
 from .sqlite import SQLite
 
-class Factory(object):
+class Factory:
     """
     Database Factory - creates database connections
     """

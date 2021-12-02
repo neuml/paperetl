@@ -6,7 +6,7 @@ import re
 
 from lxml import etree
 
-class Table(object):
+class Table:
     """
     Parses text content from HTML tables.
     """
@@ -50,7 +50,7 @@ class Table(object):
 
             for row in rows:
                 # Build concatenated header value string
-                values = ["%s %s" % (headers[x] if x < len(headers) else "", column.text) for x, column in enumerate(row)]
+                values = [f"{headers[x] if x < len(headers) else ''} {column.text}" for x, column in enumerate(row)]
 
                 # Create single row string
                 value = " ".join(values)

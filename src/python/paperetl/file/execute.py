@@ -11,7 +11,7 @@ from .pdf import PDF
 from .pmb import PMB
 from .tei import TEI
 
-class Execute(object):
+class Execute:
     """
     Transforms and loads medical/scientific files into an articles database.
     """
@@ -32,36 +32,36 @@ class Execute(object):
         return "rb" if extension == "pdf" or (source and source.lower().startswith("pubmed")) else "r"
 
     @staticmethod
-    def process(stream, source, models, extension):
+    def process(stream, source, extension, config):
         """
         Processes a data input stream and yields articles
 
         Args:
             stream: handle to input data stream
             source: text string describing stream source, can be None
-            models: path to study models
             extension: data format
+            config: path to config directory
         """
 
         if extension == "pdf":
-            yield PDF.parse(stream, source, models)
+            yield PDF.parse(stream, source)
         elif extension == "xml":
             if source and source.lower().startswith("pubmed"):
-                yield from PMB.parse(stream, source, models)
+                yield from PMB.parse(stream, source, config)
             else:
-                yield TEI.parse(stream, source, models)
+                yield TEI.parse(stream, source)
         elif extension == "csv":
-            yield from CSV.parse(stream, source, models)
+            yield from CSV.parse(stream, source)
 
     @staticmethod
-    def run(indir, url, models):
+    def run(indir, url, config=None):
         """
         Main execution method.
 
         Args:
             indir: input directory
             url: database url
-            models: model directory
+            config: path to config directory, if any
         """
 
         # Build database connection
@@ -84,10 +84,10 @@ class Execute(object):
                     # Determine if file needs to be open in binary or text mode
                     mode = Execute.mode(f, extension)
 
-                    print("Processing: %s" % path)
+                    print(f"Processing: {path}")
                     with open(path, mode) as data:
                         # Yield articles from input stream
-                        for article in Execute.process(data, f, models, extension):
+                        for article in Execute.process(data, f, extension, config):
                             # Save article if unique
                             if article and article.uid() not in ids:
                                 db.save(article)

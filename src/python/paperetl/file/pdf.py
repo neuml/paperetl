@@ -8,20 +8,19 @@ import requests
 
 from .tei import TEI
 
-class PDF(object):
+class PDF:
     """
     Methods to transform medical/scientific PDFs into article objects.
     """
 
     @staticmethod
-    def parse(stream, source, models):
+    def parse(stream, source):
         """
         Parses a medical/scientific PDF datastream and returns a processed article.
 
         Args:
             stream: handle to input data stream
             source: text string describing stream source, can be None
-            models: path to study models
 
         Returns:
             Article
@@ -31,7 +30,7 @@ class PDF(object):
         xml = PDF.convert(stream)
 
         # Parse and return object
-        return TEI.parse(xml, source, models) if xml else None
+        return TEI.parse(xml, source) if xml else None
 
     @staticmethod
     def convert(stream):
@@ -50,7 +49,7 @@ class PDF(object):
 
         # Validate request was successful
         if not response.ok:
-            print("Failed to process file - %s" % (response.text))
+            print(f"Failed to process file - {response.text}")
             return None
 
         # Wrap as StringIO

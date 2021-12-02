@@ -2,17 +2,17 @@
 Article module.
 """
 
-class Article(object):
+class Article:
     """
     Article objects. Holds all metadata and text content related to an article.
     """
 
     # Articles schema
-    ARTICLE = ("id", "source", "published", "publication", "authors", "title", "tags", "design",
-               "size", "sample", "method", "reference", "entry")
+    ARTICLE = ("id", "source", "published", "publication", "authors", "affiliations", "affiliation", "title",
+               "tags", "reference", "entry")
 
     # Sections schema
-    SECTION = ("name", "text", "labels")
+    SECTION = ("name", "text")
 
     def __init__(self, metadata, sections, source):
         """
@@ -46,17 +46,7 @@ class Article(object):
             article tags
         """
 
-        return self.metadata[6]
-
-    def design(self):
-        """
-        Returns the article design.
-
-        Returns:
-            article design
-        """
-
-        return self.metadata[7]
+        return self.metadata[8]
 
     def build(self):
         """

@@ -44,7 +44,7 @@ class TestFileExport(TestProcess):
         output = Utils.FILE + "/models"
 
         # Build articles database
-        Execute.run(Utils.FILE + "/data", "%s://" % method + output, Utils.STUDY)
+        Execute.run(Utils.FILE + "/data", "%s://" % method + output)
 
         # Count of articles/sections
         articles = 0
@@ -62,4 +62,4 @@ class TestFileExport(TestProcess):
 
         # Validate counts
         self.assertEqual(articles, 17)
-        self.assertEqual(sections, 3640)
+        self.assertEqual(sections, 3646)

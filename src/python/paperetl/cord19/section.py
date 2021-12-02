@@ -50,7 +50,7 @@ class Section(object):
             article = os.path.join(directory, path)
 
             try:
-                with open(article) as jfile:
+                with open(article, encoding="utf-8") as jfile:
                     data = json.load(jfile)
 
                     # Extract text from body
@@ -72,7 +72,7 @@ class Section(object):
 
             # pylint: disable=W0703
             except Exception as ex:
-                print("Error processing text file: {}".format(article), ex)
+                print(f"Error processing text file: {article}", ex)
 
         # Filter out boilerplate elements from text
         return Section.filtered(sections)

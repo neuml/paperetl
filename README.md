@@ -55,10 +55,6 @@ Python 3.6+ is supported
 
 ### Additional dependencies
 
-Study design detection uses scispacy and can be installed via:
-
-    pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.2.5/en_core_sci_md-0.2.5.tar.gz
-
 PDF parsing relies on an existing GROBID instance to be up and running. It is assumed that this is running locally on the ETL server. This is not
 necessary for the CORD-19 dataset.
 
@@ -99,17 +95,7 @@ The following example shows how to use paperetl to load the CORD-19 dataset into
 
     The script above retrieves and unpacks the latest copy of CORD-19 into a directory named `cord19/data`. An optional second argument sets a specific date of the dataset in the format YYYY-MM-DD (ex. 2021-01-01) which defaults to the latest date.
 
-2. Download [study design model](https://github.com/neuml/paperetl/releases/download/v1.6.0/study.tar.gz)
-
-    ```bash
-    scripts/getstudy.sh cord19/models
-    ```
-
-    The script above retrieves and unpacks a copy of the study model into a directory named `cord19/models`.
-
-    The [study design model](https://www.kaggle.com/davidmezzetti/cord19-study-design) with training data is also available on Kaggle.
-
-3. Generate entry-dates.csv for current version of the dataset
+2. Generate entry-dates.csv for current version of the dataset
 
     ```bash
     python -m paperetl.cord19.entry cord19/data
@@ -120,7 +106,7 @@ The following example shows how to use paperetl to load the CORD-19 dataset into
 
     A version of [entry-dates.csv](https://www.kaggle.com/davidmezzetti/cord-19-article-entry-dates/output) is also available on Kaggle.
 
-4. Build database
+3. Build database
 
     ```bash
     python -m paperetl.cord19 cord19/data cord19/models cord19/models
@@ -134,15 +120,7 @@ The following example shows how to use paperetl to load a set of medical/scienti
 
 1. Download the desired medical/scientific articles in a local directory. For this example, it is assumed the articles are in a directory named `paperetl/data`
 
-2. Download [study design model](https://github.com/neuml/paperetl/releases/download/v1.6.0/study.tar.gz)
-
-    ```bash
-    scripts/getstudy.sh paperetl/models
-    ```
-
-    The [study design model](https://www.kaggle.com/davidmezzetti/cord19-study-design) with training data can also be found on Kaggle.
-
-3. Build the database
+2. Build the database
 
     ```bash
     python -m paperetl.file paperetl/data paperetl/models paperetl/models

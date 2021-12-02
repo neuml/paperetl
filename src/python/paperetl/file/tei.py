@@ -9,33 +9,27 @@ from bs4 import BeautifulSoup
 from dateutil import parser
 from nltk.tokenize import sent_tokenize
 
-from ..analysis import Study
-from ..grammar import getGrammar
 from ..schema.article import Article
 from ..table import Table
 from ..text import Text
 
-class TEI(object):
+class TEI:
     """
     Methods to transform TEI (Text Encoding Initiative) XML into article objects.
     """
 
     @staticmethod
-    def parse(stream, source, models):
+    def parse(stream, source):
         """
         Parses a TEI XML datastream and returns a processed article.
 
         Args:
             stream: handle to input data stream
             source: text string describing stream source, can be None
-            models: path to study models
 
         Returns:
             Article
         """
-
-        # Get grammar handle
-        grammar = getGrammar()
 
         soup = BeautifulSoup(stream, "lxml")
 
@@ -52,28 +46,16 @@ class TEI(object):
         # Parse text sections
         sections = TEI.text(soup, title)
 
-        # Build NLP tokens for sections
-        tokenslist = grammar.parse([text for _, text in sections])
-
-        # Join NLP tokens with sections
-        sections = [(name, text, tokenslist[x]) for x, (name, text) in enumerate(sections) if tokenslist[x]]
-
-        # Parse study design fields
-        design, size, sample, method, labels = Study.parse(sections, models)
-
-        # Add additional fields to each section
-        sections = [(name, text, labels[x] if labels[x] else grammar.label(tokens)) for x, (name, text, tokens) in enumerate(sections)]
-
         # Derive uid
         uid = hashlib.sha1(title.encode("utf-8") if title else reference.encode("utf-8")).hexdigest()
 
         # Default title to source if empty
         title = title if title else source
 
-        # Article metadata - id, source, published, publication, authors, title, tags, design, sample size
-        #                    sample section, sample method, reference, entry date
-        metadata = (uid, source, published, publication, authors, title, "PDF", design, size,
-                    sample, method, reference, datetime.datetime.now().strftime("%Y-%m-%d"))
+        # Article metadata - id, source, published, publication, authors, affiliations, affiliation, title,
+        #                    tags, reference, entry date
+        metadata = (uid, source, published, publication, authors, None, None, title,
+                   "PDF", reference, datetime.datetime.now().strftime("%Y-%m-%d"))
 
         return Article(metadata, sections, source)
 
@@ -116,7 +98,7 @@ class TEI(object):
             forename = name.find("forename")
 
             if surname and forename:
-                authors.append("%s, %s" % (surname.text, forename.text))
+                authors.append(f"{surname.text}, {forename.text}")
 
         return "; ".join(authors)
 

@@ -40,11 +40,11 @@ def getPattern():
         # Remove citations references (ex. (NUM1) repeated at least 3 times with whitespace
         patterns.append(r"(\(\d+\)\s){3,}")
 
-        PATTERN = re.compile("|".join(["(%s)" % p for p in patterns]))
+        PATTERN = re.compile("|".join([f"({p})" for p in patterns]))
 
     return PATTERN
 
-class Text(object):
+class Text:
     """
     Methods for formatting and cleaning text.
     """

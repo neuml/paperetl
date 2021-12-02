@@ -11,13 +11,11 @@ from datetime import datetime
 from multiprocessing import Pool
 from dateutil import parser
 
-from ..analysis import Study
 from ..factory import Factory
-from ..grammar import getGrammar
 from ..schema.article import Article
 from .section import Section
 
-class Execute(object):
+class Execute:
     """
     Transforms and loads CORD-19 data into an articles database.
     """
@@ -109,7 +107,7 @@ class Execute(object):
                     r"covid(?:[\-\s]?(?:20)?19)?", r"n\s?cov[\-\s]?2019", r"sars[\-\s]cov-?2", r"wuhan (?:coronavirus|cov|pneumonia)"]
 
         # Build regular expression for each keyword. Wrap term in word boundaries
-        regex = "|".join(["\\b%s\\b" % keyword.lower() for keyword in keywords])
+        regex = "|".join([f"\\b{keyword.lower()}\\b" for keyword in keywords])
 
         tags = None
         for _, text in sections:
@@ -121,13 +119,12 @@ class Execute(object):
         return tags
 
     @staticmethod
-    def stream(indir, models, dates, merge):
+    def stream(indir, dates, merge):
         """
         Generator that yields rows from a metadata.csv file. The directory is also included.
 
         Args:
             indir: input directory
-            models: models directory
             dates: list of uid - entry dates for current metadata file
             merge: only merges/processes this list of uids, if enabled
         """
@@ -135,7 +132,7 @@ class Execute(object):
         # Filter out duplicate ids
         ids, hashes = set(), set()
 
-        with open(os.path.join(indir, "metadata.csv"), mode="r") as csvfile:
+        with open(os.path.join(indir, "metadata.csv"), mode="r", encoding="utf-8") as csvfile:
             for row in csv.DictReader(csvfile):
                 # cord uid
                 uid = row["cord_uid"]
@@ -148,7 +145,7 @@ class Execute(object):
                 #  - cord uid in entry date mapping
                 #  - cord uid and sha hash not already processed
                 if (merge is None or uid in merge) and uid in dates and uid not in ids and sha not in hashes:
-                    yield (row, indir, models)
+                    yield (row, indir)
 
                 # Add uid and sha as processed
                 ids.add(uid)
@@ -160,17 +157,14 @@ class Execute(object):
         Processes a single row
 
         Args:
-            params: (row, indir, models)
+            params: (row, indir)
 
         Returns:
             (id, article, sections)
         """
 
-        # Get grammar handle
-        grammar = getGrammar()
-
         # Unpack parameters
-        row, indir, models = params
+        row, indir = params
 
         # Published date
         date = Execute.getDate(row)
@@ -181,29 +175,10 @@ class Execute(object):
         # Search recent documents for COVID-19 keywords
         tags = Execute.getTags(sections) if not date or date >= datetime(2019, 7, 1) else None
 
-        if tags:
-            # Build NLP tokens for sections
-            tokenslist = grammar.parse([text for _, text in sections])
-
-            # Join NLP tokens with sections
-            sections = [(name, text, tokenslist[x]) for x, (name, text) in enumerate(sections)]
-
-            # Parse study design fields
-            design, size, sample, method, labels = Study.parse(sections, models)
-
-            # Add additional fields to each section
-            sections = [(name, text, labels[x] if labels[x] else grammar.label(tokens)) for x, (name, text, tokens) in enumerate(sections)]
-        else:
-            # Untagged section, create None default placeholders
-            design, size, sample, method = None, None, None, None
-
-            # Extend sections with empty columns
-            sections = [(name, text, None) for name, text in sections]
-
-        # Article metadata - id, source, published, publication, authors, title, tags, design, sample size
-        #                    sample section, sample method, reference
-        metadata = (row["cord_uid"], row["source_x"], date, row["journal"], row["authors"], row["title"], tags, design, size,
-                    sample, method, Execute.getUrl(row))
+        # Article metadata - id, source, published, publication, authors, affiliations, affiliation, title,
+        #                    tags, reference
+        metadata = (row["cord_uid"], row["source_x"], date, row["journal"], row["authors"], None, None, row["title"],
+                    tags, Execute.getUrl(row))
 
         return Article(metadata, sections, None)
 
@@ -228,13 +203,13 @@ class Execute(object):
             entryfile = os.path.join(indir, "entry-dates.csv")
 
         # Load in memory date lookup
-        with open(entryfile, mode="r") as csvfile:
+        with open(entryfile, mode="r", encoding="utf-8") as csvfile:
             for row in csv.DictReader(csvfile):
                 entries[row["sha"]] = (row["cord_uid"], row["date"])
 
         # Reduce down to entries only in metadata
         dates = {}
-        with open(os.path.join(indir, "metadata.csv"), mode="r") as csvfile:
+        with open(os.path.join(indir, "metadata.csv"), mode="r", encoding="utf-8") as csvfile:
             for row in csv.DictReader(csvfile):
                 # Lookup hash
                 sha = Execute.getHash(row)
@@ -249,25 +224,23 @@ class Execute(object):
         return dates
 
     @staticmethod
-    def run(indir, url, models, entryfile, full, merge):
+    def run(indir, url, entryfile, full, merge):
         """
         Main execution method.
 
         Args:
             indir: input directory
             url: database url
-            models: model directory
             entryfile: path to entry dates file
             full: full database load if True, only loads tagged articles if False
             merge: database url to use for merging prior results
         """
 
-        print("Building articles database from {}".format(indir))
+        print(f"Building articles database from {indir}")
 
-        # Set database url and models defaults if not provided
+        # Set database url
         if not url:
             url = os.path.join(os.path.expanduser("~"), ".cord19", "models")
-            models = url
 
         # Create database
         db = Factory.create(url)
@@ -282,7 +255,7 @@ class Execute(object):
 
         # Create process pool
         with Pool(os.cpu_count()) as pool:
-            for article in pool.imap(Execute.process, Execute.stream(indir, models, dates, merge), 100):
+            for article in pool.imap(Execute.process, Execute.stream(indir, dates, merge), 100):
                 # Get unique id
                 uid = article.uid()
 

@@ -1,11 +1,11 @@
 # pylint: disable = C0111
 from setuptools import find_packages, setup
 
-with open("README.md", "r") as f:
+with open("README.md", "r", encoding="utf-8") as f:
     DESCRIPTION = f.read()
 
 setup(name="paperetl",
-      version="1.7.0",
+      version="2.0.0",
       author="NeuML",
       description="ETL processes for medical and scientific papers",
       long_description=DESCRIPTION,
@@ -26,16 +26,10 @@ setup(name="paperetl",
           "elasticsearch>=7.8.0",
           "lxml>=4.5.0",
           "nltk>=3.5",
-          "numpy>=1.18.4",
           "pandas>=1.1.0",
           "python-dateutil>=2.8.1",
           "PyYAML>=5.3",
-          "regex>=2020.5.14",
           "requests>=2.22.0",
-          "scikit-learn>=0.23.1",
-          "scipy>=1.4.1",
-          "spacy>=2.3.2,<3.0.0",
-          "text2digits>=0.1.0"
       ],
       classifiers=[
           "License :: OSI Approved :: Apache Software License",

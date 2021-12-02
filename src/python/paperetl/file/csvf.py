@@ -7,21 +7,19 @@ import datetime
 
 from ..schema.article import Article
 
-class CSV(object):
+class CSV:
     """
     Methods to transform CSVs into article objects.
     """
 
-    #pylint: disable=W0613
     @staticmethod
-    def parse(stream, source, models):
+    def parse(stream, source):
         """
         Parses a CSV datastream and yields processed articles.
 
         Args:
             stream: handle to input data stream
             source: text string describing stream source, can be None
-            models: path to study models
         """
 
         for row in csv.DictReader(stream):
@@ -46,10 +44,10 @@ class CSV(object):
             metadata tuple
         """
 
-        # Article metadata - id, source, published, publication, authors, title, tags, design, sample size
-        #                    sample section, sample method, reference, entry date
-        fields = ("id", "source", "published", "publication", "authors", "title", "tags", "design", "samplesize",
-                  "sampletext", "method", "reference", "entry")
+        # Article metadata - id, source, published, publication, authors, affiliations, affiliation, title,
+        #                    tags, reference, entry date
+        fields = ("id", "source", "published", "publication", "authors", "affiliations", "affiliation", "title",
+                  "tags", "reference", "entry")
 
         metadata = []
         for field in fields:
@@ -86,4 +84,4 @@ class CSV(object):
             text += " " + abstract
 
         # Create single section from text
-        return [(None, text, None)]
+        return [(None, text)]

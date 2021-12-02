@@ -20,7 +20,7 @@ from .execute import Execute
 URL = "https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com"
 DIRECTORY = os.path.join(tempfile.gettempdir(), "metadata")
 
-class Entry(object):
+class Entry:
     """
     Transforms a list of metadata files into an entry-dates.csv file.
     """
@@ -42,7 +42,7 @@ class Entry(object):
             os.mkdir(DIRECTORY)
 
         # Read list of dates from AI2 CORD-19 page
-        changelog = requests.get("%s/latest/changelog" % URL)
+        changelog = requests.get(f"{URL}/latest/changelog")
         dates = [line for line in changelog.text.splitlines() if re.match(r"\d{4}\-\d{2}\-\d{2}", line)]
 
         # Sort dates
@@ -62,9 +62,9 @@ class Entry(object):
             current = datetime.strptime(date, "%Y-%m-%d")
 
             if date == dates[-1] or current.day == 1 or (last and current.month != last.month):
-                url = "%s/%s/metadata.csv" % (URL, date)
-                path = os.path.join(DIRECTORY, "%s.csv" % date)
-                print("Retrieving %s to %s" % (url, path))
+                url = f"{URL}/{date}/metadata.csv"
+                path = os.path.join(DIRECTORY, f"{date}.csv")
+                print(f"Retrieving {url} to {path}")
 
                 # Only pull file if it's not already cached
                 if not os.path.exists(path):
@@ -100,7 +100,7 @@ class Entry(object):
         for metadata in files:
             # Parse date from file name
             date = os.path.splitext(metadata)[0]
-            with open(os.path.join(DIRECTORY, metadata), mode="r") as csvfile:
+            with open(os.path.join(DIRECTORY, metadata), mode="r", encoding="utf-8") as csvfile:
                 for row in csv.DictReader(csvfile):
                     # Get hash value
                     sha = Execute.getHash(row)
