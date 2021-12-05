@@ -65,4 +65,4 @@ class TestFileExport(TestProcess):
 
         # Validate counts
         self.assertEqual(articles, 20)
-        self.assertEqual(sections, 3668)
+        self.assertEqual(sections, 3662)

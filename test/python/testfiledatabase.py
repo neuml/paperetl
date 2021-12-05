@@ -68,6 +68,7 @@ class TestFileDatabase(TestProcess):
         hashes = {
             "00398e4c637f5e5447e35e63669187f0239c0357": "769aabf322421b2e34a32d7afce4d046",
             "00c4c8c42473d25ebb38c4a8a14200c6900be2e9": "c1b8cebfb55231215a865eaa8e16d338",
+            "02ab610f42452d706ba305f258e0f91fd271be3b": "e508cf1bb20c6fae6f2bdcde8977e095",
             "1000": "babc1842c2dd9bf298bf6376a1b58318",
             "1001": "d8579348f06c6428565cab60ef797d0d",
             "17a845a8681cca77a4497462e797172148448d7d": "f1768e230244ab984530c482f275f439",
@@ -84,7 +85,6 @@ class TestFileDatabase(TestProcess):
             "6cb7a79749913fa0c2c3748cbfee2f654d5cea36": "53ff57038e6257a5fa8032cdc40b0750",
             "a09f0fcf41e01f2cdb5685b5000964797f679132": "d2a98edeb923ec781a44bf7c166bfc77",
             "b9f6e3d2dd7d18902ac3a538789d836793dd48b2": "a7b77a4e68f9134e134c306b00d489d8",
-            "da60cb944e50dbecbfd217581cb5f55bda332d7a": "a39676892934b50d7cd2e299f3a68d21",
             "dff0088d65a56e2673d11ad2f7a180687cab6f70": "f22696dbdce156d5a81b7231d1ef983b",
         }
 
@@ -111,7 +111,7 @@ class TestFileDatabase(TestProcess):
         Test number of sections
         """
 
-        self.sectionCount(3668)
+        self.sectionCount(3662)
 
     def testSections(self):
         """
@@ -121,6 +121,7 @@ class TestFileDatabase(TestProcess):
         hashes = {
             "00398e4c637f5e5447e35e63669187f0239c0357": "cd5548d4c6dc551429b9544edfc1d40a",
             "00c4c8c42473d25ebb38c4a8a14200c6900be2e9": "fe8778439a5aa68fe48f0bfbcc48d021",
+            "02ab610f42452d706ba305f258e0f91fd271be3b": "0afb118260ef0f2ab6da1a5290bd3ca8",
             "1000": "2a2708e0a5e9847955bb7b441a4f7ea4",
             "1001": "147aca4eade4737a7a1d438a5a1d3ed1",
             "17a845a8681cca77a4497462e797172148448d7d": "8c50748e74883ac316d2473cf491d4e0",
@@ -137,7 +138,6 @@ class TestFileDatabase(TestProcess):
             "6cb7a79749913fa0c2c3748cbfee2f654d5cea36": "2387f11ea786cc4265c54f096080ad00",
             "a09f0fcf41e01f2cdb5685b5000964797f679132": "78596af571f3250057c1df23eabfc498",
             "b9f6e3d2dd7d18902ac3a538789d836793dd48b2": "51d5b0cf2273a687a348502c95c6dbec",
-            "da60cb944e50dbecbfd217581cb5f55bda332d7a": "73f7744629e4feb5988acbd31117c7f1",
             "dff0088d65a56e2673d11ad2f7a180687cab6f70": "c61df238a8ecb9a63422f19b2218949d",
         }
 
