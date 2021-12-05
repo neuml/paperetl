@@ -106,7 +106,13 @@ class Execute:
             indir: input directory
             config: path to config directory, if any
             inputs: inputs queue
+
+        Returns:
+            total number of items put into inputs queue
         """
+
+        # Total number of files put into input queue
+        total = 0
 
         # Recursively walk directory looking for files
         for root, _, files in sorted(os.walk(indir)):
@@ -124,6 +130,9 @@ class Execute:
 
                     # Write parameters to inputs queue
                     inputs.put((path, f, extension, compress, config))
+                    total += 1
+
+        return total
 
     @staticmethod
     def save(processes, outputs, db):
@@ -170,11 +179,11 @@ class Execute:
         inputs, outputs = Queue(), Queue(30000)
 
         # Scan input directory and add files to inputs queue
-        Execute.scan(indir, config, inputs)
+        total = Execute.scan(indir, config, inputs)
 
         # Start worker processes
         processes = []
-        for _ in range(min(inputs.qsize(), os.cpu_count())):
+        for _ in range(min(total, os.cpu_count())):
             process = Process(target=Execute.process, args=(inputs, outputs))
             process.start()
             processes.append(process)
