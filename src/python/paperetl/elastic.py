@@ -22,12 +22,13 @@ class Elastic(Database):
         "mappings": {"properties": {"sections": {"type": "nested"}}},
     }
 
-    def __init__(self, url):
+    def __init__(self, url, replace):
         """
         Connects and initializes an elasticsearch instance.
 
         Args:
             url: elasticsearch url
+            replace: If database should be recreated
         """
 
         # Connect to ES instance
@@ -39,8 +40,16 @@ class Elastic(Database):
         # Buffered actions
         self.buffer = []
 
-        # Create index if it doesn't exist
-        if not self.connection.indices.exists("articles"):
+        # Check if index exists
+        exists = self.connection.indices.exists("articles")
+
+        # Delete if replace enabled
+        if exists and replace:
+            self.connection.indices.delete("articles")
+            exists = False
+
+        # Create if necessary
+        if not exists:
             self.connection.indices.create("articles", Elastic.ARTICLES)
 
     def save(self, article):

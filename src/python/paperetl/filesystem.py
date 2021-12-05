@@ -31,8 +31,8 @@ class FileSystem(Database):
     def save(self, article):
         output = article.uid() + f".{self.extension()}"
         output = (
-            f"{os.path.splitext(article.source)[0]}-{output}"
-            if article.source
+            f"{os.path.splitext(article.source())[0]}-{output}"
+            if article.source()
             else output
         )
 

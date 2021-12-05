@@ -26,19 +26,17 @@ class Article:
     # Sections schema
     SECTION = ("name", "text")
 
-    def __init__(self, metadata, sections, source):
+    def __init__(self, metadata, sections):
         """
         Stores article metadata and section content as an object.
 
         Args:
             metadata: article metadata
             sections: text sections
-            source: article source
         """
 
         self.metadata = metadata
         self.sections = sections
-        self.source = source
 
     def uid(self):
         """
@@ -50,6 +48,16 @@ class Article:
 
         return self.metadata[0]
 
+    def source(self):
+        """
+        Returns the article source.
+
+        Returns:
+            article source
+        """
+
+        return self.metadata[1]
+
     def tags(self):
         """
         Returns the article tags.
@@ -59,6 +67,16 @@ class Article:
         """
 
         return self.metadata[8]
+
+    def entry(self):
+        """
+        Returns the article entry date.
+
+        Returns:
+            article entry date
+        """
+
+        return self.metadata[10]
 
     def build(self):
         """

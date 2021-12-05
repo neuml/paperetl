@@ -25,7 +25,6 @@ jobs:
           pip install -U pip wheel coverage coveralls
           pip install .
           python -c "import nltk; nltk.download('punkt')"
-          pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.2.5/en_core_sci_md-0.2.5.tar.gz
           python --version
           make data coverage
         env:

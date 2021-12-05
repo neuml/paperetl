@@ -1,8 +1,7 @@
 """
-Transforms and loads PubMed archive XML files into an articles database.
+PubMed archive XML processing module
 """
 
-import datetime
 import os
 import re
 
@@ -70,9 +69,10 @@ class PMB:
         uid = int(citation.find("PMID").text)
         source = source if source else "PMB"
         reference = f"https://pubmed.ncbi.nlm.nih.gov/{uid}"
+        entry = PMB.date(citation.find("DateRevised"))
 
         # Journal fields
-        published = PMB.date(journal)
+        published = PMB.published(journal)
         publication = PMB.get(journal, "Title")
 
         # Article fields
@@ -103,10 +103,10 @@ class PMB:
                 title,
                 tags,
                 reference,
-                datetime.datetime.now().strftime("%Y-%m-%d"),
+                entry,
             )
 
-            return Article(metadata, sections, source)
+            return Article(metadata, sections)
 
         return None
 
@@ -141,7 +141,27 @@ class PMB:
         return "".join(element.itertext()) if element is not None else None
 
     @staticmethod
-    def date(journal):
+    def date(element):
+        """
+        Attempts to parse a date from an element.
+
+        Args:
+            element: input element
+
+        Return:
+            Date if parsed
+        """
+
+        date = ""
+        for field in ["Year", "Month", "Day"]:
+            value = PMB.get(element, field)
+            if value:
+                date += "-" + value if date else value
+
+        return parser.parse(date) if date else None
+
+    @staticmethod
+    def published(journal):
         """
         Parses the published date. Multiple date formats are handled via the
         dateparser library.
@@ -155,19 +175,14 @@ class PMB:
 
         element = journal.find("JournalIssue/PubDate")
 
-        date = ""
-        for field in ["Year", "Month", "Day"]:
-            value = PMB.get(element, field)
-            if value:
-                date += "-" + value if date else value
-
+        date = PMB.date(element)
         if not date:
-            # Attempt to parse out date
+            # Fallback to MedlineDate
             date = PMB.get(element, "MedlineDate")
             date = re.search(r"\d{4}", date)
-            date = date.group() if date else None
+            date = parser.parse(date.group()) if date else None
 
-        return parser.parse(date) if date else None
+        return date if date else None
 
     @staticmethod
     def authors(journal):

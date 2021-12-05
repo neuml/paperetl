@@ -128,14 +128,13 @@ class Execute:
         return tags
 
     @staticmethod
-    def stream(indir, dates, merge):
+    def stream(indir, dates):
         """
         Generator that yields rows from a metadata.csv file. The directory is also included.
 
         Args:
             indir: input directory
             dates: list of uid - entry dates for current metadata file
-            merge: only merges/processes this list of uids, if enabled
         """
 
         # Filter out duplicate ids
@@ -152,15 +151,9 @@ class Execute:
                 sha = Execute.getHash(row)
 
                 # Only process if all conditions below met:
-                #  - Merge set to None (must check for None as merge can be an empty set) or uid in list of ids to merge
                 #  - cord uid in entry date mapping
                 #  - cord uid and sha hash not already processed
-                if (
-                    (merge is None or uid in merge)
-                    and uid in dates
-                    and uid not in ids
-                    and sha not in hashes
-                ):
+                if uid in dates and uid not in ids and sha not in hashes:
                     yield (row, indir)
 
                 # Add uid and sha as processed
@@ -210,7 +203,7 @@ class Execute:
             Execute.getUrl(row),
         )
 
-        return Article(metadata, sections, None)
+        return Article(metadata, sections)
 
     @staticmethod
     def entryDates(indir, entryfile):
@@ -251,12 +244,12 @@ class Execute:
 
                 # Store date if cord uid maps to value in entries
                 if row["cord_uid"] == uid:
-                    dates[uid] = date
+                    dates[uid] = parser.parse(date)
 
         return dates
 
     @staticmethod
-    def run(indir, url, entryfile, full, merge):
+    def run(indir, url, entryfile=None, replace=False):
         """
         Main execution method.
 
@@ -264,42 +257,35 @@ class Execute:
             indir: input directory
             url: database url
             entryfile: path to entry dates file
-            full: full database load if True, only loads tagged articles if False
-            merge: database url to use for merging prior results
+            replace: if true, a new database will be created, overwriting any existing database
         """
 
         print(f"Building articles database from {indir}")
 
-        # Set database url
-        if not url:
-            url = os.path.join(os.path.expanduser("~"), ".cord19", "models")
-
         # Create database
-        db = Factory.create(url)
+        db = Factory.create(url, replace)
 
         # Load entry dates
         dates = Execute.entryDates(indir, entryfile)
 
-        # Merge existing db, if present
-        if merge:
-            merge = db.merge(merge, dates)
-            print("Merged results from existing articles database")
-
         # Create process pool
         with Pool(os.cpu_count()) as pool:
             for article in pool.imap(
-                Execute.process, Execute.stream(indir, dates, merge), 100
+                Execute.process, Execute.stream(indir, dates), 100
             ):
                 # Get unique id
                 uid = article.uid()
 
                 # Only load untagged rows if this is a full database load
-                if full or article.tags():
+                if article.tags():
                     # Append entry date
                     article.metadata = article.metadata + (dates[uid],)
 
                     # Save article
                     db.save(article)
+
+            pool.close()
+            pool.join()
 
         # Complete processing
         db.complete()

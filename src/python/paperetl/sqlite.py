@@ -5,7 +5,7 @@ SQLite module
 import os
 import sqlite3
 
-from datetime import datetime, timedelta
+from dateutil import parser
 
 from .database import Database
 
@@ -58,25 +58,23 @@ class SQLite(Database):
     INSERT_ROW = "INSERT INTO {table} ({columns}) VALUES ({values})"
     CREATE_INDEX = "CREATE INDEX section_article ON sections(article)"
 
-    # Merge SQL statements
-    ATTACH_DB = "ATTACH DATABASE '{path}' as {name}"
-    DETACH_DB = "DETACH DATABASE '{name}'"
-    MAX_ENTRY = "SELECT MAX(entry) from {name}.articles"
-    LOOKUP_ARTICLE = "SELECT Id FROM {name}.articles WHERE Id=? AND Entry = ?"
-    MERGE_ARTICLE = "INSERT INTO articles SELECT * FROM {name}.articles WHERE Id = ?"
-    MERGE_SECTIONS = (
-        "INSERT INTO sections SELECT * FROM {name}.sections WHERE Article=?"
-    )
-    UPDATE_ENTRY = "UPDATE articles SET entry = ? WHERE Id = ?"
-    ARTICLE_COUNT = "SELECT COUNT(1) FROM articles"
-    SECTION_COUNT = "SELECT MAX(id) FROM sections"
+    # Restore index when updating an existing database
+    SECTION_COUNT = "SELECT MAX(Id) FROM sections"
 
-    def __init__(self, outdir):
+    # Lookup entry date for an article
+    LOOKUP_ENTRY = "SELECT Entry FROM articles WHERE id = ?"
+
+    # Delete article
+    DELETE_ARTICLE = "DELETE FROM articles WHERE id = ?"
+    DELETE_SECTIONS = "DELETE FROM sections WHERE article = ?"
+
+    def __init__(self, outdir, replace):
         """
         Creates and initializes a new output SQLite database.
 
         Args:
             outdir: output directory
+            replace: If database should be recreated
         """
 
         # Create if output path doesn't exist
@@ -85,103 +83,92 @@ class SQLite(Database):
         # Output database file
         dbfile = os.path.join(outdir, "articles.sqlite")
 
-        # Delete existing file
-        if os.path.exists(dbfile):
+        # Create flag
+        create = replace or not os.path.exists(dbfile)
+
+        # Delete existing file if replace set
+        if replace and os.path.exists(dbfile):
             os.remove(dbfile)
 
         # Index fields
         self.aindex, self.sindex = 0, 0
 
-        # Create output database
+        # Connect to output database
         self.db = sqlite3.connect(dbfile)
 
         # Create database cursor
         self.cur = self.db.cursor()
 
-        # Create articles table
-        self.create(SQLite.ARTICLES, "articles")
+        if create:
+            # Create articles table
+            self.create(SQLite.ARTICLES, "articles")
 
-        # Create sections table
-        self.create(SQLite.SECTIONS, "sections")
+            # Create sections table
+            self.create(SQLite.SECTIONS, "sections")
+
+            # Create articles index for sections table
+            self.execute(SQLite.CREATE_INDEX)
+        else:
+            # Restore section index id
+            self.sindex = int(self.cur.execute(SQLite.SECTION_COUNT).fetchone()[0]) + 1
 
         # Start transaction
         self.cur.execute("BEGIN")
 
-    def merge(self, url, ids):
-        # List of IDs to set for processing
-        queue = set()
-
-        # Attached database alias
-        alias = "merge"
-
-        # Attach database
-        self.db.execute(SQLite.ATTACH_DB.format(path=url, name=alias))
-
-        # Only process records newer than 5 days before the last run
-        lastrun = self.cur.execute(SQLite.MAX_ENTRY.format(name=alias)).fetchone()[0]
-        lastrun = datetime.strptime(lastrun, "%Y-%m-%d") - timedelta(days=5)
-        lastrun = lastrun.strftime("%Y-%m-%d")
-
-        # Search for existing articles
-        for uid, date in ids.items():
-            self.cur.execute(SQLite.LOOKUP_ARTICLE.format(name=alias), [uid, date])
-            if not self.cur.fetchone() and date > lastrun:
-                # Add uid to process
-                queue.add(uid)
-            else:
-                # Copy existing record
-                self.cur.execute(SQLite.MERGE_ARTICLE.format(name=alias), [uid])
-                self.cur.execute(SQLite.MERGE_SECTIONS.format(name=alias), [uid])
-
-                # Sync entry date with ids list
-                self.cur.execute(SQLite.UPDATE_ENTRY, [date, uid])
-
-        # Set current index positions
-        self.aindex = (
-            int(self.cur.execute(SQLite.ARTICLE_COUNT.format(name=alias)).fetchone()[0])
-            + 1
-        )
-        self.sindex = (
-            int(self.cur.execute(SQLite.SECTION_COUNT.format(name=alias)).fetchone()[0])
-            + 1
-        )
-
-        # Commit transaction
-        self.db.commit()
-
-        # Detach database
-        self.db.execute(SQLite.DETACH_DB.format(name=alias))
-
-        # Start new transaction
-        self.cur.execute("BEGIN")
-
-        # Return list of new/updated ids to process
-        return queue
-
     def save(self, article):
-        # Article row
-        self.insert(SQLite.ARTICLES, "articles", article.metadata)
+        # Save article if not a duplicate
+        if self.savearticle(article):
+            # Increment number of articles processed
+            self.aindex += 1
+            if self.aindex % 1000 == 0:
+                print(f"Inserted {self.aindex} articles", end="\r")
 
-        # Increment number of articles processed
-        self.aindex += 1
-        if self.aindex % 1000 == 0:
-            print(f"Inserted {self.aindex} articles", end="\r")
+                # Commit current transaction and start a new one
+                self.transaction()
 
-            # Commit current transaction and start a new one
-            self.transaction()
+            for name, text in article.sections:
+                # Section row - id, article, name, text
+                self.insert(
+                    SQLite.SECTIONS,
+                    "sections",
+                    (self.sindex, article.uid(), name, text),
+                )
+                self.sindex += 1
 
-        for name, text in article.sections:
-            # Section row - id, article, name, text
-            self.insert(
-                SQLite.SECTIONS, "sections", (self.sindex, article.uid(), name, text)
+    def savearticle(self, article):
+        """
+        Saves an article to SQLite. If a duplicate entry is found, this method compares the entry
+        date and keeps the article with the latest entry date.
+
+        Args:
+            article: article metadata and text content
+
+        Returns
+            True if article saved, False otherwise
+        """
+
+        try:
+            # Article row
+            self.insert(SQLite.ARTICLES, "articles", article.metadata)
+        except sqlite3.IntegrityError:
+            # Duplicate detected get entry date to determine action
+            entry = parser.parse(
+                self.cur.execute(SQLite.LOOKUP_ENTRY, [article.uid()]).fetchone()[0]
             )
-            self.sindex += 1
+
+            # Keep existing article if existing entry date is same or newer
+            if article.entry() <= entry:
+                return False
+
+            # Delete and re-insert article
+            self.cur.execute(SQLite.DELETE_ARTICLE, [article.uid()])
+            self.cur.execute(SQLite.DELETE_SECTIONS, [article.uid()])
+            self.insert(SQLite.ARTICLES, "articles", article.metadata)
+
+        return True
 
     def complete(self):
         print(f"Total articles inserted: {self.aindex}")
-
-        # Create articles index for sections table
-        self.execute(SQLite.CREATE_INDEX)
 
     def close(self):
         self.db.commit()
@@ -208,11 +195,7 @@ class SQLite(Database):
         create = SQLite.CREATE_TABLE.format(table=name, fields=", ".join(columns))
 
         # pylint: disable=W0703
-        try:
-            self.cur.execute(create)
-        except Exception as e:
-            print(create)
-            print("Failed to create table: " + e)
+        self.cur.execute(create)
 
     def execute(self, sql):
         """
@@ -240,12 +223,8 @@ class SQLite(Database):
             table=name, columns=", ".join(columns), values=("?, " * len(columns))[:-2]
         )
 
-        try:
-            # Execute insert statement
-            self.cur.execute(insert, self.values(table, row, columns))
-        # pylint: disable=W0703
-        except Exception as ex:
-            print(f"Error inserting row: {row}", ex)
+        # Execute insert statement
+        self.cur.execute(insert, self.values(table, row, columns))
 
     def values(self, table, row, columns):
         """

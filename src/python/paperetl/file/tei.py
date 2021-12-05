@@ -37,7 +37,14 @@ class TEI:
         title = soup.title.text
 
         # Extract article metadata
-        published, publication, authors, reference = TEI.metadata(soup)
+        (
+            published,
+            publication,
+            authors,
+            affiliations,
+            affiliation,
+            reference,
+        ) = TEI.metadata(soup)
 
         # Validate parsed data
         if not title and not reference:
@@ -63,15 +70,15 @@ class TEI:
             published,
             publication,
             authors,
-            None,
-            None,
+            affiliations,
+            affiliation,
             title,
             "PDF",
             reference,
-            datetime.datetime.now().strftime("%Y-%m-%d"),
+            parser.parse(datetime.datetime.now().strftime("%Y-%m-%d")),
         )
 
-        return Article(metadata, sections, source)
+        return Article(metadata, sections)
 
     @staticmethod
     def date(published):
@@ -101,16 +108,18 @@ class TEI:
     @staticmethod
     def authors(source):
         """
-        Builds an authors string from a TEI sourceDesc tag.
+        Parses authors and associated affiliations from the article.
 
         Args:
-            source: sourceDesc tag handle
+            elements: authors elements
 
         Returns:
-            semicolon separated list of authors
+            (semicolon separated list of authors, semicolon separated list of affiliations, primary affiliation)
         """
 
         authors = []
+        affiliations = []
+
         for name in source.find_all("persname"):
             surname = name.find("surname")
             forename = name.find("forename")
@@ -118,7 +127,15 @@ class TEI:
             if surname and forename:
                 authors.append(f"{surname.text}, {forename.text}")
 
-        return "; ".join(authors)
+        for affiliation in source.find_all("affiliation"):
+            names = [name.text for name in affiliation.find_all("orgname")]
+            affiliations.append((", ".join(names)))
+
+        return (
+            "; ".join(authors),
+            "; ".join(dict.fromkeys(affiliations)),
+            affiliations[-1] if affiliations else None,
+        )
 
     @staticmethod
     def metadata(soup):
@@ -141,7 +158,7 @@ class TEI:
             # Parse publication information
             published = TEI.date(published)
             publication = publication.text if publication else None
-            authors = TEI.authors(source)
+            authors, affiliations, affiliation = TEI.authors(source)
 
             struct = soup.find("biblstruct")
             reference = (
@@ -150,9 +167,16 @@ class TEI:
                 else None
             )
         else:
-            published, publication, authors, reference = None, None, None, None
+            published, publication, authors, affiliations, affiliation, reference = (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            )
 
-        return (published, publication, authors, reference)
+        return (published, publication, authors, affiliations, affiliation, reference)
 
     @staticmethod
     def abstract(soup, title):

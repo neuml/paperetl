@@ -35,7 +35,7 @@ class TestFileExport(TestProcess):
 
     def export(self, method):
         """
-        Test a file export.
+        Test a file export
 
         Args:
             method: export method (json or yaml)
@@ -64,5 +64,5 @@ class TestFileExport(TestProcess):
                     sections += len(data["sections"])
 
         # Validate counts
-        self.assertEqual(articles, 17)
-        self.assertEqual(sections, 3646)
+        self.assertEqual(articles, 20)
+        self.assertEqual(sections, 3668)

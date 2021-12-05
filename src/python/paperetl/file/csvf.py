@@ -5,6 +5,8 @@ CSV processing module
 import csv
 import datetime
 
+from dateutil import parser
+
 from ..schema.article import Article
 
 
@@ -30,7 +32,7 @@ class CSV:
             # Parse sections
             sections = CSV.sections(row)
 
-            yield Article(metadata, sections, source)
+            yield Article(metadata, sections)
 
     @staticmethod
     def metadata(row, source):
@@ -67,7 +69,11 @@ class CSV:
             if field == "source":
                 value = row.get(field, source)
             elif field == "entry":
-                value = row.get(field, datetime.datetime.now().strftime("%Y-%m-%d"))
+                # Parse date field if found, otherwise use current date
+                value = row.get(field)
+                value = parser.parse(
+                    value if value else datetime.datetime.now().strftime("%Y-%m-%d")
+                )
             else:
                 value = row.get(field)
 
