@@ -167,7 +167,7 @@ class Execute:
         db = Factory.create(url, replace)
 
         # Create queues, limit size of output queue
-        inputs, outputs = Queue(), Queue(100000)
+        inputs, outputs = Queue(), Queue(30000)
 
         # Scan input directory and add files to inputs queue
         Execute.scan(indir, config, inputs)
