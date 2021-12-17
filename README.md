@@ -37,7 +37,7 @@ paperetl is an ETL library for processing medical and scientific papers. It supp
     - CSV
 - COVID-19 Research Dataset (CORD-19)
 
-paperetl supports the following databases for storing articles:
+paperetl supports the following output options for storing articles:
 
 - SQLite
 - Elasticsearch
@@ -58,8 +58,8 @@ paperetl can also be installed directly from GitHub to access the latest, unrele
 
 ### Additional dependencies
 
-PDF parsing relies on an existing GROBID instance to be up and running. It is assumed that this is running locally on the ETL server. This is not
-necessary for the CORD-19 dataset.
+PDF parsing relies on an existing GROBID instance to be up and running. It is assumed that this is running locally on the ETL server. This is only
+necessary for PDF files.
 
 - [GROBID install instructions](https://grobid.readthedocs.io/en/latest/Install-Grobid/)
 - [GROBID start service](https://grobid.readthedocs.io/en/latest/Grobid-service/)
@@ -133,13 +133,13 @@ Once complete, there will be an articles.sqlite file in cord19/models
 
 Both of the examples above also support storing data in Elasticsearch with the following changes. These examples assume Elasticsearch is running locally, change the URL to a remote server as appropriate.
 
+Articles:
+
+    python -m paperetl.file paperetl/data http://localhost:9200 paperetl/models
+
 CORD-19:
 
     python -m paperetl.cord19 cord19/data http://localhost:9200
-
-PDF Articles:
-
-    python -m paperetl.file paperetl/data http://localhost:9200 paperetl/models
 
 Once complete, there will be an articles index in elasticsearch with the metadata and full text stored.
 
