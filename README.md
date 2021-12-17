@@ -31,8 +31,11 @@
 
 paperetl is an ETL library for processing medical and scientific papers. It supports the following sources:
 
-- [CORD-19](https://www.semanticscholar.org/cord19)
-- PDF articles
+- File formats:
+    - PDF
+    - XML (arXiv, PubMed, TEI)
+    - CSV
+- COVID-19 Research Dataset (CORD-19)
 
 paperetl supports the following databases for storing articles:
 
@@ -47,7 +50,7 @@ The easiest way to install is via pip and PyPI
 
     pip install paperetl
 
-Python 3.6+ is supported. Using a Python [virtual environment](https://docs.python.org/3/library/venv.html) is recommended.
+Python 3.7+ is supported. Using a Python [virtual environment](https://docs.python.org/3/library/venv.html) is recommended.
 
 paperetl can also be installed directly from GitHub to access the latest, unreleased features.
 
@@ -83,6 +86,20 @@ This will bring up a paperetl command shell. Standard Docker commands can be use
 | [CORD-19 Article Entry Dates](https://www.kaggle.com/davidmezzetti/cord-19-article-entry-dates) | Generates CORD-19 entry-dates.csv file |
 | [CORD-19 ETL](https://www.kaggle.com/davidmezzetti/cord-19-etl) | Builds an article.sqlite database for CORD-19 data |
 
+### Load Articles into SQLite
+
+The following example shows how to use paperetl to load a set of medical/scientific articles into a SQLite database.
+
+1. Download the desired medical/scientific articles in a local directory. For this example, it is assumed the articles are in a directory named `paperetl/data`
+
+2. Build the database
+
+    ```bash
+    python -m paperetl.file paperetl/data paperetl/models paperetl/models
+    ```
+
+Once complete, there will be an articles.sqlite file in paperetl/models
+
 ### Load CORD-19 into SQLite
 
 The following example shows how to use paperetl to load the CORD-19 dataset into a SQLite database.
@@ -114,20 +131,6 @@ The following example shows how to use paperetl to load the CORD-19 dataset into
 
 Once complete, there will be an articles.sqlite file in cord19/models
 
-### Load PDF Articles into SQLite
-
-The following example shows how to use paperetl to load a set of medical/scientific pdf articles into a SQLite database.
-
-1. Download the desired medical/scientific articles in a local directory. For this example, it is assumed the articles are in a directory named `paperetl/data`
-
-2. Build the database
-
-    ```bash
-    python -m paperetl.file paperetl/data paperetl/models paperetl/models
-    ```
-
-Once complete, there will be an articles.sqlite file in paperetl/models
-
 ### Load into Elasticsearch
 
 Both of the examples above also support storing data in Elasticsearch with the following changes. These examples assume Elasticsearch is running locally, change the URL to a remote server as appropriate.
@@ -142,9 +145,9 @@ PDF Articles:
 
 Once complete, there will be an articles index in elasticsearch with the metadata and full text stored.
 
-### Convert PDF articles to JSON/YAML
+### Convert articles to JSON/YAML
 
-paperetl can also be used to convert PDF articles into JSON or YAML files. This is useful if the data is to be fed into another system or for manual inspection/debugging of a single file.
+paperetl can also be used to convert articles into JSON or YAML files. This is useful if the data is to be fed into another system or for manual inspection/debugging of a single file.
 
 JSON:
 

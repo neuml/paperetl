@@ -21,7 +21,7 @@ setup(
     packages=find_packages(where="src/python"),
     package_dir={"": "src/python"},
     keywords="etl parse covid-19 medical scientific papers",
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     install_requires=[
         "beautifulsoup4>=4.8.1",
         "elasticsearch>=7.8.0",
