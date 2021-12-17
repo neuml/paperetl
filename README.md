@@ -121,8 +121,6 @@ The following example shows how to use paperetl to load the CORD-19 dataset into
     An optional second argument sets a specific date of the dataset in the format YYYY-MM-DD (ex. 2021-01-01) which defaults of the latest
     date. This should match the date used in Step 1.
 
-    A version of [entry-dates.csv](https://www.kaggle.com/davidmezzetti/cord-19-article-entry-dates/output) is also available on Kaggle.
-
 3. Build database
 
     ```bash
