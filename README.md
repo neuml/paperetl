@@ -124,7 +124,7 @@ The following example shows how to use paperetl to load the CORD-19 dataset into
 3. Build database
 
     ```bash
-    python -m paperetl.cord19 cord19/data cord19/models cord19/models
+    python -m paperetl.cord19 cord19/data cord19/models
     ```
 
 Once complete, there will be an articles.sqlite file in cord19/models
