@@ -39,8 +39,17 @@ class TestFileDatabase(TestProcess):
         # Build articles database
         Execute.run(Utils.FILE + "/data", Utils.FILE + "/models", None, True)
 
-        # Run again with replace=False
-        Execute.run(Utils.FILE + "/data", Utils.FILE + "/models")
+        # Generate filter files
+        with open(Utils.FILE + "/models/codes", "w", encoding="utf-8") as output:
+            output.write("0\n")
+
+        with open(Utils.FILE + "/models/ids", "w", encoding="utf-8") as output:
+            output.write("0\n")
+
+        # Run again with replace=False and filtering
+        Execute.run(
+            Utils.FILE + "/data", Utils.FILE + "/models", Utils.FILE + "/models"
+        )
 
     def setUp(self):
         """
