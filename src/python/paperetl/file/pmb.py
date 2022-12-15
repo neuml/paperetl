@@ -18,6 +18,28 @@ class PMB:
     Methods to transform PubMed archive XML files into article objects.
     """
 
+    @staticmethod
+    def load(config, name):
+        """
+        Loads a set of filters from a configuration file.
+
+        Args:
+            config: config directory path
+            name: name of config file
+
+        Returns:
+            set of filters
+        """
+
+        filters = None
+
+        path = os.path.join(config, name) if config else None
+        if path and os.path.exists(path):
+            with open(path, encoding="utf-8") as f:
+                filters = set(line.strip() for line in f)
+
+        return filters
+
     # pylint: disable=W0613
     @staticmethod
     def parse(stream, source, config):
@@ -30,12 +52,11 @@ class PMB:
             config: path to config directory
         """
 
-        # Load MeSH filter codes if available
-        codes = None
-        path = os.path.join(config, "codes") if config else None
-        if path and os.path.exists(path):
-            with open(os.path.join(config, "codes"), encoding="utf-8") as f:
-                codes = set(line.strip() for line in f)
+        # Load id and MeSH filters, if available
+        ids, codes = PMB.load(config, "ids"), PMB.load(config, "codes")
+
+        # Convert ids to ints
+        ids = set(int(x) for x in ids) if ids else None
 
         # Parse HTML content using lxml
         # pylint: disable=c-extension-no-member,stop-iteration-return
@@ -44,18 +65,19 @@ class PMB:
 
         for event, element in document:
             if event == "end" and element.tag == "PubmedArticle":
-                yield PMB.process(element, source, codes)
+                yield PMB.process(element, source, ids, codes)
                 root.clear()
 
     @staticmethod
-    def process(element, source, codes):
+    def process(element, source, ids, codes):
         """
         Processes a single XML article element into an Article.
 
         Args:
             element: XML element
             source: text string describing stream source, can be None
-            codes: List of MeSH codes to filter, can be None
+            ids: List of ids to select, can be None
+            codes: List of MeSH codes to select, can be None
 
         Returns:
             Article or None if Article not parsed
@@ -67,6 +89,16 @@ class PMB:
 
         # General fields
         uid = int(citation.find("PMID").text)
+
+        # If ids is set, check before processing rest of record
+        if ids and uid not in ids:
+            return None
+
+        # If MeSH codes is set and codes were parsed, check before processing rest of record
+        mesh = PMB.mesh(citation)
+        if mesh and codes and not any(x for x in mesh if x in codes):
+            return None
+
         source = source if source else "PMB"
         reference = f"https://pubmed.ncbi.nlm.nih.gov/{uid}"
         entry = PMB.date(citation.find("DateRevised"))
@@ -79,17 +111,14 @@ class PMB:
         title = PMB.get(article, "ArticleTitle")
         authors, affiliations, affiliation = PMB.authors(article)
 
-        # MeSH codes for filtering, always match if no target MeSH codes available
-        mesh = PMB.mesh(citation)
-        match = [x for x in mesh if x in codes] if codes else True
-
         # Create tags
         tags = "; ".join(["PMB"] + mesh)
 
         # Abstract text
         sections = PMB.sections(article, title)
 
-        if len(sections) > 1 and (match or not mesh):
+        # Require title and at least one section
+        if len(sections) > 1:
             # Article metadata - id, source, published, publication, authors, affiliations, affiliation, title,
             #                    tags, reference, entry date
             metadata = (
