@@ -15,8 +15,8 @@ class Indices:
     Mock elasticsearch class for testing
     """
 
-    exists = lambda *args: True
-    delete = lambda *args: True
+    exists = lambda *args, **kwargs: True
+    delete = lambda *args, **kwargs: True
     refresh = lambda *args, **kwargs: True
 
 

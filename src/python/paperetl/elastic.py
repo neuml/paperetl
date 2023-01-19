@@ -41,16 +41,20 @@ class Elastic(Database):
         self.buffer = []
 
         # Check if index exists
-        exists = self.connection.indices.exists("articles")
+        exists = self.connection.indices.exists(index="articles")
 
         # Delete if replace enabled
         if exists and replace:
-            self.connection.indices.delete("articles")
+            self.connection.indices.delete(index="articles")
             exists = False
 
         # Create if necessary
         if not exists:
-            self.connection.indices.create("articles", Elastic.ARTICLES)
+            self.connection.indices.create(
+                index="articles",
+                settings=Elastic.ARTICLES["settings"],
+                mappings=Elastic.ARTICLES["mappings"],
+            )
 
     def save(self, article):
         # Build article
