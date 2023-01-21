@@ -17,8 +17,8 @@ RUN ln -sf /usr/bin/python3.7 /usr/bin/python && \
 # Install GROBID
 # This method builds a trimmed down standalone service. A much simpler method is unzipping then running:
 # ./gradlew install && ./gradlew run
-RUN wget https://github.com/kermitt2/grobid/archive/0.6.1.zip && \
-    unzip 0.6.1.zip && rm 0.6.1.zip && mv grobid-0.6.1 grobid-install && \
+RUN wget https://github.com/kermitt2/grobid/archive/0.7.2.zip && \
+    unzip 0.7.2.zip && rm 0.7.2.zip && mv grobid-0.7.2 grobid-install && \
     cd grobid-install && ./gradlew clean assemble && \
     mkdir -p ../grobid && cd ../grobid && \
     unzip ../grobid-install/grobid-home/build/distributions/grobid-home*.zip && \
@@ -40,8 +40,7 @@ RUN echo "#!/bin/bash" > scripts/start.sh && \
     chmod 755 scripts/start.sh
 
 # Create paperetl directories
-RUN mkdir -p cord19/data && \
-    mkdir -p paperetl/data
+RUN mkdir -p paperetl/data
 
 # Start script
 ENTRYPOINT scripts/start.sh

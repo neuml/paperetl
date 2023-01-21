@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Get target date, default to latest file
-DATE=${2:-`date -d 'yesterday' +'%Y-%m-%d'`}
+DATE=${2:-"2022-06-02"}
 
 # Create CORD-19 directory
 mkdir -p $1 && cd $1
