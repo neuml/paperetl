@@ -77,14 +77,13 @@ necessary for PDF files.
 
 A Dockerfile with commands to install paperetl, all dependencies and scripts is available in this repository.
 
-Clone this git repository and run the following to build and run the Docker image.
-
 ```
-docker build -t paperetl -f docker/Dockerfile .
+wget https://raw.githubusercontent.com/neuml/paperetl/master/docker/Dockerfile
+docker build -t paperetl -f Dockerfile .
 docker run --name paperetl --rm -it paperetl
 ```
 
-This will bring up a paperetl command shell. Standard Docker commands can be used to copy files over or commands can be run directly in the shell to retrieve input content. All scripts in the following examples are available in this environment.
+This will bring up a paperetl command shell. Standard Docker commands can be used to copy files over or commands can be run directly in the shell to retrieve input content.
 
 ## Examples
 
