@@ -101,7 +101,7 @@ The following example shows how to use paperetl to load a set of medical/scienti
 2. Build the database
 
     ```
-    python -m paperetl.file paperetl/data paperetl/models paperetl/models
+    python -m paperetl.file paperetl/data paperetl/models
     ```
 
 Once complete, there will be an articles.sqlite file in paperetl/models
@@ -111,7 +111,7 @@ Once complete, there will be an articles.sqlite file in paperetl/models
 Elasticsearch is also a supported datastore as shown below. This example assumes Elasticsearch is running locally, change the URL to a remote server as appropriate.
 
 ```
-python -m paperetl.file paperetl/data http://localhost:9200 paperetl/models
+python -m paperetl.file paperetl/data http://localhost:9200
 ```
 
 Once complete, there will be an articles index in Elasticsearch with the metadata and full text stored.
@@ -123,13 +123,13 @@ paperetl can also be used to convert articles into JSON or YAML files. This is u
 JSON:
 
 ```
-python -m paperetl.file paperetl/data json://paperetl/json paperetl/models
+python -m paperetl.file paperetl/data json://paperetl/json
 ```
 
 YAML:
 
 ```
-python -m paperetl.file paperetl/data yaml://paperetl/yaml paperetl/models
+python -m paperetl.file paperetl/data yaml://paperetl/yaml
 ```
 
 Converted files will be stored in paperetl/(json|yaml)
