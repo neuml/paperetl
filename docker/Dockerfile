@@ -22,16 +22,15 @@ RUN wget https://github.com/kermitt2/grobid/archive/0.7.2.zip && \
     cd grobid-install && ./gradlew clean assemble && \
     mkdir -p ../grobid && cd ../grobid && \
     unzip ../grobid-install/grobid-home/build/distributions/grobid-home*.zip && \
-    cp ../grobid-install/grobid-service/config/config.yaml . && \
+    cp ../grobid-install/grobid-home/config/grobid.yaml config.yaml && \
     cp ../grobid-install/grobid-service/build/libs/grobid-service*onejar.jar ./grobid-service.jar && \
     rm -rf ~/.gradle ../grobid-install grobid-home/pdf2xml/mac-64/ grobid-home/pdf2xml/win-32/ grobid-home/pdf2xml/win-64
 
 # Cleanup build packages
 RUN apt-get -y purge openjdk-8-jdk-headless && apt-get -y autoremove
 
-# Copy paperetl scripts
+# Create scripts directory for start.sh
 RUN mkdir -p scripts
-COPY scripts/ ./scripts/
 
 # Create start script
 RUN echo "#!/bin/bash" > scripts/start.sh && \
