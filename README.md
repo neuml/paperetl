@@ -89,8 +89,9 @@ This will bring up a paperetl command shell. Standard Docker commands can be use
 
 ### Notebooks
 
-| Notebook  |  Description |
-|:----------|:-------------|
+| Notebook  | Description  |       |
+|:----------|:-------------|------:|
+| [Introducing paperetl](https://github.com/neuml/paperetl/blob/master/examples/01_Introducing_paperetl.ipynb) | Overview of the functionality provided by paperetl | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/neuml/paperetl/blob/master/examples/01_Introducing_paperetl.ipynb) |
 
 ### Load Articles into SQLite
 
