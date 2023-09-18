@@ -2,11 +2,12 @@
 from setuptools import find_packages, setup
 
 with open("README.md", "r", encoding="utf-8") as f:
-    DESCRIPTION = f.read()
+    # Remove GitHub dark mode images
+    DESCRIPTION = "".join([line for line in f if "gh-dark-mode-only" not in line])
 
 setup(
     name="paperetl",
-    version="2.3.0",
+    version="2.2.1",
     author="NeuML",
     description="ETL processes for medical and scientific papers",
     long_description=DESCRIPTION,
