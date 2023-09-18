@@ -7,7 +7,7 @@ with open("README.md", "r", encoding="utf-8") as f:
 
 setup(
     name="paperetl",
-    version="2.2.1",
+    version="2.3.0",
     author="NeuML",
     description="ETL processes for medical and scientific papers",
     long_description=DESCRIPTION,
