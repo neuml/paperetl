@@ -2,9 +2,9 @@
     <img src="https://raw.githubusercontent.com/neuml/paperetl/master/logo.png"/>
 </p>
 
-<h3 align="center">
-    <p>ETL processes for medical and scientific papers</p>
-</h3>
+<p align="center">
+    <b>ETL processes for medical and scientific papers</b>
+</p>
 
 <p align="center">
     <a href="https://github.com/neuml/paperetl/releases">
