@@ -242,9 +242,9 @@ class TEI:
             sections.extend([(name, x) for x in sent_tokenize(text)])
 
         # Extract text from tables
-        for figure in soup.find("text").find_all("figure"):
-            # Use XML Id as figure name to ensure figures are uniquely named
-            name = figure.get("xml:id").upper()
+        for i, figure in enumerate(soup.find("text").find_all("figure")):
+            # index as figure name to ensure figures are uniquely named
+            name = f"FIGURE_{i}"
 
             # Search for table
             table = figure.find("table")
