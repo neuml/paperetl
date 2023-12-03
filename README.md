@@ -73,7 +73,7 @@ necessary for PDF files.
 - [GROBID install instructions](https://grobid.readthedocs.io/en/latest/Install-Grobid/)
 - [GROBID start service](https://grobid.readthedocs.io/en/latest/Grobid-service/)
 
-_Note: Depending on the number of CPUs in your system, the GROBID engine pool may be exhausted when parsing PDFs, resulting in a 503 error. This can be fixed by increasing the `concurrency` and/or `poolMaxWait` setting in the [GROBID configuration file](https://grobid.readthedocs.io/en/latest/Configuration/#service-configuration)._
+_Note: In some cases, the GROBID engine pool may become exhausted, resulting in a 503 error. This can be fixed by increasing the `concurrency` and/or `poolMaxWait` setting in the [GROBID configuration file](https://grobid.readthedocs.io/en/latest/Configuration/#service-configuration)._
 
 ### Docker
 
