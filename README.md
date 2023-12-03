@@ -73,7 +73,7 @@ necessary for PDF files.
 - [GROBID install instructions](https://grobid.readthedocs.io/en/latest/Install-Grobid/)
 - [GROBID start service](https://grobid.readthedocs.io/en/latest/Grobid-service/)
 
-Note the concurrency setting for the GROBID service is 10.  Depending on the number of CPUs in your system, this may cause paperetl to exhaust the GROBID engine pool, resulting in a 503 service unable error response when parsing PDFs.  You can avoid this by increasing the concurrency setting in the GROBID configuration file as described in this [section](https://grobid.readthedocs.io/en/latest/Configuration/#service-configuration) of the documentation.
+_Note: Depending on the number of CPUs in your system, the GROBID engine pool may be exhausted when parsing PDFs, resulting in a 503 error. This can be fixed by increasing the `concurrency` and/or `poolMaxWait` setting in the [GROBID configuration file](https://grobid.readthedocs.io/en/latest/Configuration/#service-configuration)._
 
 ### Docker
 
