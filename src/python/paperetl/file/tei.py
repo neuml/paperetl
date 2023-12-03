@@ -243,8 +243,9 @@ class TEI:
 
         # Extract text from tables
         for i, figure in enumerate(soup.find("text").find_all("figure")):
-            # index as figure name to ensure figures are uniquely named
-            name = f"FIGURE_{i}"
+            # Use XML Id (if available) as figure name to ensure figures are uniquely named
+            name = figure.get("xml:id")
+            name = name.upper() if name else f"FIGURE_{i}"
 
             # Search for table
             table = figure.find("table")
