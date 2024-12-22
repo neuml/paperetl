@@ -152,9 +152,7 @@ class SQLite(Database):
             self.insert(SQLite.ARTICLES, "articles", article.metadata)
         except sqlite3.IntegrityError:
             # Duplicate detected get entry date to determine action
-            entry = parser.parse(
-                self.cur.execute(SQLite.LOOKUP_ENTRY, [article.uid()]).fetchone()[0]
-            )
+            entry = parser.parse(self.cur.execute(SQLite.LOOKUP_ENTRY, [article.uid()]).fetchone()[0])
 
             # Keep existing article if existing entry date is same or newer
             if article.entry() <= entry:
@@ -219,9 +217,7 @@ class SQLite(Database):
 
         # Build insert prepared statement
         columns = [name for name, _ in table.items()]
-        insert = SQLite.INSERT_ROW.format(
-            table=name, columns=", ".join(columns), values=("?, " * len(columns))[:-2]
-        )
+        insert = SQLite.INSERT_ROW.format(table=name, columns=", ".join(columns), values=("?, " * len(columns))[:-2])
 
         # Execute insert statement
         self.cur.execute(insert, self.values(table, row, columns))

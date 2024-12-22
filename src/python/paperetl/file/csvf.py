@@ -71,9 +71,7 @@ class CSV:
             elif field == "entry":
                 # Parse date field if found, otherwise use current date
                 value = row.get(field)
-                value = parser.parse(
-                    value if value else datetime.datetime.now().strftime("%Y-%m-%d")
-                )
+                value = parser.parse(value if value else datetime.datetime.now().strftime("%Y-%m-%d"))
             else:
                 value = row.get(field)
 

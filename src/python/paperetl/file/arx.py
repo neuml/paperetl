@@ -49,10 +49,7 @@ class ARX:
             authors, affiliations, affiliation = ARX.authors(entry.find_all("author"))
 
             # Get tags
-            tags = "; ".join(
-                ["ARX"]
-                + [category.get("term") for category in entry.find_all("category")]
-            )
+            tags = "; ".join(["ARX"] + [category.get("term") for category in entry.find_all("category")])
 
             # Transform section text
             sections = ARX.sections(title, ARX.get(entry, "summary"))
@@ -128,12 +125,7 @@ class ARX:
             authors.append(", ".join(name.rsplit(maxsplit=1)[::-1]))
 
             # Add affiliations
-            affiliations.extend(
-                [
-                    ARX.clean(affiliation.text)
-                    for affiliation in author.find_all("arxiv:affiliation")
-                ]
-            )
+            affiliations.extend([ARX.clean(affiliation.text) for affiliation in author.find_all("arxiv:affiliation")])
 
         return (
             "; ".join(authors),

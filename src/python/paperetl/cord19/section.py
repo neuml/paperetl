@@ -57,11 +57,7 @@ class Section:
                     # Extract text from body
                     for section in data["body_text"]:
                         # Section name and text
-                        name = (
-                            section["section"].upper()
-                            if len(section["section"].strip()) > 0
-                            else None
-                        )
+                        name = section["section"].upper() if len(section["section"].strip()) > 0 else None
                         text = section["text"].replace("\n", " ")
 
                         # Clean and transform text
@@ -73,9 +69,7 @@ class Section:
                     # Extract text from tables
                     for name, entry in data["ref_entries"].items():
                         if "html" in entry and entry["html"]:
-                            sections.extend(
-                                [(name, x) for x in Table.parse(entry["html"])]
-                            )
+                            sections.extend([(name, x) for x in Table.parse(entry["html"])])
 
             # pylint: disable=W0703
             except Exception as ex:

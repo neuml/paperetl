@@ -140,9 +140,7 @@ class Execute:
         # Filter out duplicate ids
         ids, hashes = set(), set()
 
-        with open(
-            os.path.join(indir, "metadata.csv"), mode="r", encoding="utf-8"
-        ) as csvfile:
+        with open(os.path.join(indir, "metadata.csv"), mode="r", encoding="utf-8") as csvfile:
             for row in csv.DictReader(csvfile):
                 # cord uid
                 uid = row["cord_uid"]
@@ -182,11 +180,7 @@ class Execute:
         sections = Section.parse(row, indir)
 
         # Search recent documents for COVID-19 keywords
-        tags = (
-            Execute.getTags(sections)
-            if not date or date >= datetime(2019, 7, 1)
-            else None
-        )
+        tags = Execute.getTags(sections) if not date or date >= datetime(2019, 7, 1) else None
 
         # Article metadata - id, source, published, publication, authors, affiliations, affiliation, title,
         #                    tags, reference
@@ -232,9 +226,7 @@ class Execute:
 
         # Reduce down to entries only in metadata
         dates = {}
-        with open(
-            os.path.join(indir, "metadata.csv"), mode="r", encoding="utf-8"
-        ) as csvfile:
+        with open(os.path.join(indir, "metadata.csv"), mode="r", encoding="utf-8") as csvfile:
             for row in csv.DictReader(csvfile):
                 # Lookup hash
                 sha = Execute.getHash(row)
@@ -270,9 +262,7 @@ class Execute:
 
         # Create process pool
         with Pool(os.cpu_count()) as pool:
-            for article in pool.imap(
-                Execute.process, Execute.stream(indir, dates), 100
-            ):
+            for article in pool.imap(Execute.process, Execute.stream(indir, dates), 100):
                 # Get unique id
                 uid = article.uid()
 

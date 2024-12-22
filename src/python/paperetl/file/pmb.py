@@ -257,11 +257,7 @@ class PMB:
             list of MeSH codes
         """
 
-        return [
-            descriptor.attrib["UI"]
-            for descriptor in citation.findall("MeshHeadingList//DescriptorName")
-            if descriptor.attrib["UI"]
-        ]
+        return [descriptor.attrib["UI"] for descriptor in citation.findall("MeshHeadingList//DescriptorName") if descriptor.attrib["UI"]]
 
     @staticmethod
     def sections(article, title):
@@ -344,12 +340,7 @@ class PMB:
             #   - cleaned inner text has data
             #   - no section text queued
             #   - element tag is a <b> or matches a defined section background category name
-            if (
-                not tag
-                and ctext
-                and not texts
-                and (x.tag.lower() == "b" or PMB.background(ctext))
-            ):
+            if not tag and ctext and not texts and (x.tag.lower() == "b" or PMB.background(ctext)):
                 tag = x.tag
 
             # New section if one of following:
@@ -359,14 +350,10 @@ class PMB:
             #   - no section text
             #   - last section text element ends in period
             # pylint: disable=R0916
-            if ((x.tag == tag and ctext) or (not tag and texts)) and (
-                not texts or texts[-1].strip().endswith(".")
-            ):
+            if ((x.tag == tag and ctext) or (not tag and texts)) and (not texts or texts[-1].strip().endswith(".")):
                 # Save previous section
                 if texts:
-                    sections.extend(
-                        [(name, t) for t in sent_tokenize("".join(texts).strip())]
-                    )
+                    sections.extend([(name, t) for t in sent_tokenize("".join(texts).strip())])
 
                 # Reset section name/texts
                 name = ctext if tag else "ABSTRACT"
@@ -401,11 +388,7 @@ class PMB:
 
         # Parsed abstract
         for element in elements:
-            name = (
-                PMB.section(element.attrib["Label"])
-                if "Label" in element.attrib
-                else None
-            )
+            name = PMB.section(element.attrib["Label"]) if "Label" in element.attrib else None
             name = name if name else "ABSTRACT"
 
             if element.text:
@@ -429,11 +412,7 @@ class PMB:
             True if the section name is a background category
         """
 
-        return [
-            x
-            for x in ["aim", "introduction", "background", "purpose", "objective"]
-            if x in name.lower()
-        ]
+        return [x for x in ["aim", "introduction", "background", "purpose", "objective"] if x in name.lower()]
 
     @staticmethod
     def section(name):

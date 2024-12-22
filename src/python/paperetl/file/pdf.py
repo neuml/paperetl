@@ -46,9 +46,7 @@ class PDF:
         """
 
         # Call GROBID API
-        response = requests.post(
-            "http://localhost:8070/api/processFulltextDocument", files={"input": stream}
-        )
+        response = requests.post("http://localhost:8070/api/processFulltextDocument", files={"input": stream})
 
         # Validate request was successful
         if not response.ok:

@@ -15,6 +15,7 @@ class Indices:
     Mock elasticsearch class for testing
     """
 
+    # pylint: disable=C3001
     exists = lambda *args, **kwargs: True
     delete = lambda *args, **kwargs: True
     refresh = lambda *args, **kwargs: True
@@ -25,6 +26,7 @@ class ElasticStub:
     Mock elasticsearch class for testing
     """
 
+    # pylint: disable=C3001
     indices = Indices()
     bulk = lambda *args: True
 
@@ -34,9 +36,7 @@ class TestElastic(unittest.TestCase):
     Elastic tests
     """
 
-    @mock.patch(
-        "paperetl.elastic.Elasticsearch", mock.MagicMock(return_value=ElasticStub())
-    )
+    @mock.patch("paperetl.elastic.Elasticsearch", mock.MagicMock(return_value=ElasticStub()))
     @mock.patch("paperetl.elastic.helpers", mock.MagicMock(return_value=ElasticStub()))
     def testSave(self):
         """

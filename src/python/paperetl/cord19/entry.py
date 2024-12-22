@@ -44,11 +44,7 @@ class Entry:
 
         # Read list of dates from AI2 CORD-19 page
         changelog = requests.get(f"{URL}/latest/changelog")
-        dates = [
-            line
-            for line in changelog.text.splitlines()
-            if re.match(r"\d{4}\-\d{2}\-\d{2}", line)
-        ]
+        dates = [line for line in changelog.text.splitlines() if re.match(r"\d{4}\-\d{2}\-\d{2}", line)]
 
         # Sort dates
         dates = sorted(dates)
@@ -66,11 +62,7 @@ class Entry:
             # Current date
             current = datetime.strptime(date, "%Y-%m-%d")
 
-            if (
-                date == dates[-1]
-                or current.day == 1
-                or (last and current.month != last.month)
-            ):
+            if date == dates[-1] or current.day == 1 or (last and current.month != last.month):
                 url = f"{URL}/{date}/metadata.csv"
                 path = os.path.join(DIRECTORY, f"{date}.csv")
                 print(f"Retrieving {url} to {path}")
@@ -100,14 +92,7 @@ class Entry:
         Entry.download(maxdate)
 
         # Get sorted list of metadata csv files
-        files = sorted(
-            [
-                f
-                for f in os.listdir(DIRECTORY)
-                if os.path.isfile(os.path.join(DIRECTORY, f))
-                and re.match(r"\d{4}-\d{2}-\d{2}\.csv", f)
-            ]
-        )
+        files = sorted([f for f in os.listdir(DIRECTORY) if os.path.isfile(os.path.join(DIRECTORY, f)) and re.match(r"\d{4}-\d{2}-\d{2}\.csv", f)])
 
         uids = {}
 
@@ -115,9 +100,7 @@ class Entry:
         for metadata in files:
             # Parse date from file name
             date = os.path.splitext(metadata)[0]
-            with open(
-                os.path.join(DIRECTORY, metadata), mode="r", encoding="utf-8"
-            ) as csvfile:
+            with open(os.path.join(DIRECTORY, metadata), mode="r", encoding="utf-8") as csvfile:
                 for row in csv.DictReader(csvfile):
                     # Get hash value
                     sha = Execute.getHash(row)
@@ -131,9 +114,7 @@ class Entry:
             os.makedirs(output, exist_ok=True)
 
         # Output file
-        output = (
-            os.path.join(output, "entry-dates.csv") if output else "entry-dates.csv"
-        )
+        output = os.path.join(output, "entry-dates.csv") if output else "entry-dates.csv"
 
         # Build DataFrame
         df = pd.DataFrame(uids.values(), columns=["cord_uid", "sha", "date"])

@@ -47,9 +47,7 @@ class TestFileDatabase(TestProcess):
             output.write("0\n")
 
         # Run again with replace=False and filtering
-        Execute.run(
-            Utils.FILE + "/data", Utils.FILE + "/models", Utils.FILE + "/models"
-        )
+        Execute.run(Utils.FILE + "/data", Utils.FILE + "/models", Utils.FILE + "/models")
 
     def setUp(self):
         """
@@ -99,9 +97,7 @@ class TestFileDatabase(TestProcess):
 
         self.articles(hashes)
 
-    @mock.patch(
-        "paperetl.file.pdf.requests.post", mock.MagicMock(return_value=RequestsStub())
-    )
+    @mock.patch("paperetl.file.pdf.requests.post", mock.MagicMock(return_value=RequestsStub()))
     def testPDF(self):
         """
         Tests parsing PDFs

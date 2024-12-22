@@ -30,11 +30,7 @@ class FileSystem(Database):
 
     def save(self, article):
         output = article.uid() + f".{self.extension()}"
-        output = (
-            f"{os.path.splitext(article.source())[0]}-{output}"
-            if article.source()
-            else output
-        )
+        output = f"{os.path.splitext(article.source())[0]}-{output}" if article.source() else output
 
         with open(os.path.join(self.outdir, output), "w", encoding="utf-8") as output:
             self.write(output, article.build())

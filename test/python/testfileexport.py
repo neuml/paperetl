@@ -58,9 +58,7 @@ class TestFileExport(TestProcess):
                 articles += 1
 
                 with open(path, encoding="utf-8") as ifile:
-                    data = (
-                        yaml.safe_load(ifile) if method == "yaml" else json.load(ifile)
-                    )
+                    data = yaml.safe_load(ifile) if method == "yaml" else json.load(ifile)
                     sections += len(data["sections"])
 
         # Validate counts

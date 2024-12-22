@@ -76,12 +76,8 @@ class TestCord19(TestProcess):
         Test article publish dates
         """
 
-        self.assertEqual(
-            Execute.getDate({"publish_time": "2020"}), datetime(2020, 1, 1)
-        )
-        self.assertEqual(
-            Execute.getDate({"publish_time": "2020-10-10"}), datetime(2020, 10, 10)
-        )
+        self.assertEqual(Execute.getDate({"publish_time": "2020"}), datetime(2020, 1, 1))
+        self.assertEqual(Execute.getDate({"publish_time": "2020-10-10"}), datetime(2020, 10, 10))
         self.assertEqual(Execute.getDate({"publish_time": "bad date"}), None)
         self.assertEqual(Execute.getDate({"publish_time": None}), None)
 
@@ -113,9 +109,7 @@ class TestCord19(TestProcess):
             "62520f1c4f656dcb5fe565a4c2bf4ce1f7d435ef",
         )
         self.assertEqual(
-            Execute.getHash(
-                {"sha": "47ed55bfa014cd59f58896c132c36bb0a218d11d; abcdef"}
-            ),
+            Execute.getHash({"sha": "47ed55bfa014cd59f58896c132c36bb0a218d11d; abcdef"}),
             "47ed55bfa014cd59f58896c132c36bb0a218d11d",
         )
 
