@@ -34,7 +34,8 @@ class TEI:
 
         soup = BeautifulSoup(stream, "lxml")
 
-        title = soup.title.text
+        title = soup.find("title")
+        title = title.text if title and title.text else None
 
         # Extract article metadata
         (
