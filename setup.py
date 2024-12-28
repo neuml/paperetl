@@ -7,7 +7,7 @@ with open("README.md", "r", encoding="utf-8") as f:
 
 setup(
     name="paperetl",
-    version="2.3.0",
+    version="2.4.0",
     author="NeuML",
     description="ETL processes for medical and scientific papers",
     long_description=DESCRIPTION,
@@ -21,7 +21,7 @@ setup(
     license="Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0",
     packages=find_packages(where="src/python"),
     package_dir={"": "src/python"},
-    keywords="etl parse covid-19 medical scientific papers",
+    keywords="etl parse medical scientific papers",
     python_requires=">=3.9",
     install_requires=[
         "beautifulsoup4>=4.8.1",
