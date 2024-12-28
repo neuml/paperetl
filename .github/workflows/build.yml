@@ -12,13 +12,18 @@ jobs:
 
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Python
+        uses: actions/setup-python@v4
         with:
           python-version: 3.9
 
       - name: Install dependencies - Windows
-        run: choco install wget
+        run: |
+          "PYTHONIOENCODING=utf-8" >> $env:GITHUB_ENV
+          choco install wget
         if: matrix.os == 'windows-latest'
 
       - name: Build
@@ -28,8 +33,6 @@ jobs:
           python -c "import nltk; nltk.download(['punkt', 'punkt_tab', 'averaged_perceptron_tagger_eng'])"
           python --version
           make data coverage
-        env:
-          PYTHONUTF8: 1
 
       - uses: pre-commit/action@v3.0.0
         if: matrix.os == 'ubuntu-latest'
