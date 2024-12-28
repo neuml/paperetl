@@ -25,8 +25,8 @@ jobs:
         run: |
           pip install -U pip
           pip install -U wheel coverage coveralls
-          pip install . nltk==3.6.5
-          python -c "import nltk; nltk.download('punkt')"
+          pip install .
+          python -c "import nltk; nltk.download(['punkt', 'punkt_tab', 'averaged_perceptron_tagger_eng'])"
           python --version
           make data coverage
         env:
