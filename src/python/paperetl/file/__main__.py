@@ -13,4 +13,5 @@ if __name__ == "__main__":
             sys.argv[2],
             sys.argv[3] if len(sys.argv) > 3 else None,
             sys.argv[4] == "True" if len(sys.argv) > 4 else False,
+            int(sys.argv[5]) if len(sys.argv) > 5 else 32,
         )
