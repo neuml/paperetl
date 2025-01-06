@@ -52,8 +52,8 @@ class PMB:
             config: path to config directory
         """
 
-        # Load id and MeSH filters, if available
-        ids, codes = PMB.load(config, "ids"), PMB.load(config, "codes")
+        # Load id, MeSH and keyword filters, if available
+        ids, codes, keywords = PMB.load(config, "ids"), PMB.load(config, "codes"), PMB.load(config, "keywords")
 
         # Convert ids to ints
         ids = set(int(x) for x in ids) if ids else None
@@ -65,19 +65,29 @@ class PMB:
 
         for event, element in document:
             if event == "end" and element.tag == "PubmedArticle":
-                yield PMB.process(element, source, ids, codes)
+                yield PMB.process(element, source, ids, codes, keywords)
                 root.clear()
 
     @staticmethod
-    def process(element, source, ids, codes):
+    def process(element, source, ids, codes, keywords):
         """
         Processes a single XML article element into an Article.
+
+        This method applies the following logic for filters.
+
+          - Match on ids
+          - Match on MeSH codes
+          - Match on keywords
+
+        Filters only fail if there is a list of terms to check. When there are multiple filters active, only one
+        filter has to pass.
 
         Args:
             element: XML element
             source: text string describing stream source, can be None
             ids: List of ids to select, can be None
             codes: List of MeSH codes to select, can be None
+            keywords: List of keywords to search for, can be None
 
         Returns:
             Article or None if Article not parsed
@@ -90,13 +100,15 @@ class PMB:
         # General fields
         uid = int(citation.find("PMID").text)
 
-        # If ids is set, check before processing rest of record
-        if ids and uid not in ids:
+        # Apply ids filter, skip article if ids filter fails and no other filters active
+        idsfail = ids and uid not in ids
+        if idsfail and not codes and not keywords:
             return None
 
-        # If MeSH codes is set and codes were parsed, check before processing rest of record
+        # Apply MeSH codes filter, skip article if all active filters fail
         mesh = PMB.mesh(citation)
-        if mesh and codes and not any(x for x in mesh if x in codes):
+        codesfail = codes and not any(x for x in mesh if x in codes)
+        if (not ids or idsfail) and codesfail and not keywords:
             return None
 
         source = source if source else "PMB"
@@ -117,24 +129,14 @@ class PMB:
         # Abstract text
         sections = PMB.sections(article, title)
 
-        # Require title and at least one section
-        if len(sections) > 1:
-            # Article metadata - id, source, published, publication, authors, affiliations, affiliation, title,
-            #                    tags, reference, entry date
-            metadata = (
-                str(uid),
-                source,
-                published,
-                publication,
-                authors,
-                affiliations,
-                affiliation,
-                title,
-                tags,
-                reference,
-                entry,
-            )
+        # Apply keywords filter, skip article if all active filters fail
+        wordsfail = keywords and not any(k for k in keywords if any(x for _, x in sections if k.lower() in x.lower()))
+        if (not ids or idsfail) and (not codes or codesfail) and wordsfail:
+            return None
 
+        # Require title (title is in sections) and at least one other section
+        if len(sections) > 1:
+            metadata = (str(uid), source, published, publication, authors, affiliations, affiliation, title, tags, reference, entry)
             return Article(metadata, sections)
 
         return None
