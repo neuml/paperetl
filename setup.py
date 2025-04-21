@@ -22,7 +22,7 @@ setup(
     packages=find_packages(where="src/python"),
     package_dir={"": "src/python"},
     keywords="etl parse medical scientific papers",
-    python_requires=">=3.9",
+    python_requires=">=3.10",
     install_requires=[
         "beautifulsoup4>=4.8.1",
         "elasticsearch>=7.8.0",
