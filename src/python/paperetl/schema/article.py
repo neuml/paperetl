@@ -26,17 +26,22 @@ class Article:
     # Sections schema
     SECTION = ("name", "text")
 
-    def __init__(self, metadata, sections):
+    # Citations schema
+    CITATION = ("reference",)
+
+    def __init__(self, metadata, sections, citations=None):
         """
         Stores article metadata and section content as an object.
 
         Args:
             metadata: article metadata
             sections: text sections
+            citations: citations
         """
 
         self.metadata = metadata
         self.sections = sections
+        self.citations = citations if citations else []
 
     def uid(self):
         """
@@ -92,7 +97,11 @@ class Article:
         # Create sections
         sections = [dict(zip(Article.SECTION, section)) for section in self.sections]
 
-        # Add sections to article
+        # Create citations
+        citations = [dict(zip(Article.CITATION, citation)) for citation in self.citations]
+
+        # Add sections and citations to article
         article["sections"] = sections
+        article["citations"] = citations
 
         return article

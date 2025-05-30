@@ -53,13 +53,23 @@ class SQLite(Database):
         "Text": "TEXT",
     }
 
+    # Citations schema
+    CITATIONS = {
+        "Id": "INTEGER PRIMARY KEY",
+        "Article": "TEXT",
+        "Reference": "TEXT",
+    }
+
     # SQL statements
     CREATE_TABLE = "CREATE TABLE IF NOT EXISTS {table} ({fields})"
     INSERT_ROW = "INSERT INTO {table} ({columns}) VALUES ({values})"
-    CREATE_INDEX = "CREATE INDEX section_article ON sections(article)"
+    CREATE_SECTION_INDEX = "CREATE INDEX section_article ON sections(article)"
+    CREATE_CITATION_INDEX_1 = "CREATE INDEX citation_article ON citations(article)"
+    CREATE_CITATION_INDEX_2 = "CREATE INDEX citation_reference ON citations(reference)"
 
     # Restore index when updating an existing database
     SECTION_COUNT = "SELECT MAX(Id) FROM sections"
+    CITATION_COUNT = "SELECT MAX(Id) FROM citations"
 
     # Lookup entry date for an article
     LOOKUP_ENTRY = "SELECT Entry FROM articles WHERE id = ?"
@@ -91,7 +101,7 @@ class SQLite(Database):
             os.remove(dbfile)
 
         # Index fields
-        self.aindex, self.sindex = 0, 0
+        self.aindex, self.sindex, self.cindex = 0, 0, 0
 
         # Connect to output database
         self.db = sqlite3.connect(dbfile)
@@ -106,11 +116,16 @@ class SQLite(Database):
             # Create sections table
             self.create(SQLite.SECTIONS, "sections")
 
-            # Create articles index for sections table
-            self.execute(SQLite.CREATE_INDEX)
+            # Create citations table
+            self.create(SQLite.CITATIONS, "citations")
+
+            # Create indexes
+            for index in [SQLite.CREATE_SECTION_INDEX, SQLite.CREATE_CITATION_INDEX_1, SQLite.CREATE_CITATION_INDEX_2]:
+                self.execute(index)
         else:
-            # Restore section index id
+            # Restore section and citation index id
             self.sindex = int(self.cur.execute(SQLite.SECTION_COUNT).fetchone()[0]) + 1
+            self.cindex = int(self.cur.execute(SQLite.CITATION_COUNT).fetchone()[0]) + 1
 
         # Start transaction
         self.cur.execute("BEGIN")
@@ -134,6 +149,15 @@ class SQLite(Database):
                     (self.sindex, article.uid(), name, text),
                 )
                 self.sindex += 1
+
+            for reference in article.citations:
+                # Citation row - id, article, reference
+                self.insert(
+                    SQLite.CITATIONS,
+                    "citations",
+                    (self.cindex, article.uid(), reference),
+                )
+                self.cindex += 1
 
     def savearticle(self, article):
         """

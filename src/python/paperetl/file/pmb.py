@@ -129,6 +129,9 @@ class PMB:
         # Abstract text
         sections = PMB.sections(article, title)
 
+        # Citation references
+        citations = PMB.citations(element, ids)
+
         # Apply keywords filter, skip article if all active filters fail
         wordsfail = keywords and not any(k for k in keywords if any(x for _, x in sections if k.lower() in x.lower()))
         if (not ids or idsfail) and (not codes or codesfail) and wordsfail:
@@ -137,7 +140,7 @@ class PMB:
         # Require title (title is in sections) and at least one other section
         if len(sections) > 1:
             metadata = (str(uid), source, published, publication, authors, affiliations, affiliation, title, tags, reference, entry)
-            return Article(metadata, sections)
+            return Article(metadata, sections, citations)
 
         return None
 
@@ -429,3 +432,31 @@ class PMB:
         """
 
         return re.sub(r"[^\w)]+$", "", name.strip()).upper()
+
+    @staticmethod
+    def citations(element, ids):
+        """
+        Gets a list of citation references for this article.
+
+        Args:
+            element: XML element
+            ids: List of ids to select, can be None
+
+        Returns:
+            list of citation references
+        """
+
+        # Citation references
+        citations = []
+
+        # Add pubmed references, support id filters
+        for reference in element.findall("PubmedData/ReferenceList/Reference"):
+            for article in reference.findall("ArticleIdList/ArticleId"):
+                # Get PubMed Id, if applicable
+                uid = int(article.text) if article.text and article.attrib["IdType"] == "pubmed" else None
+
+                # Validate uid is valid and in list of valid ids, if applicable
+                if uid and (not ids or uid in ids):
+                    citations.append(article.text)
+
+        return citations
