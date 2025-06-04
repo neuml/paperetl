@@ -456,7 +456,7 @@ class PMB:
                 uid = int(article.text) if article.text and article.attrib["IdType"] == "pubmed" else None
 
                 # Validate uid is valid and in list of valid ids, if applicable
-                if uid and (not ids or uid in ids):
+                if uid is not None and (not ids or uid in ids):
                     citations.append(article.text)
 
         return citations
