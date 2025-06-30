@@ -42,12 +42,15 @@ paperetl supports the following sources:
 - [Text Encoding Initiative (TEI) XML](https://grobid.readthedocs.io/en/latest/TEI-encoding-of-results/)
 - CSV with article metadta
 
-paperetl supports the following storage options for parsed articles.
+paperetl supports the following datastores for parsed articles.
 
 - SQLite
-- Elasticsearch
 - JSON files
 - YAML files
+
+Additional optional datastores are available.
+
+- Elasticsearch
 
 ## Installation
 
@@ -111,7 +114,13 @@ Once complete, there will be an articles.sqlite file in paperetl/models
 
 ### Load into Elasticsearch
 
-Elasticsearch is also a supported datastore as shown below. This example assumes Elasticsearch is running locally, change the URL to a remote server as appropriate.
+Elasticsearch is a supported datastore. It's an optional install feature via the Elasticsearch extra.
+
+```
+pip install paperetl[elasticsearch]
+```
+
+This example assumes Elasticsearch is running locally, change the URL to a remote server as appropriate.
 
 ```
 python -m paperetl.file paperetl/data http://localhost:9200

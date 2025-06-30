@@ -32,7 +32,7 @@ class Elastic(Database):
         """
 
         # Connect to ES instance
-        self.connection = Elasticsearch(hosts=[url], timeout=60, retry_on_timeout=True)
+        self.connection = Elasticsearch(hosts=[url], request_timeout=60, retry_on_timeout=True)
 
         # Row count
         self.rows = 0

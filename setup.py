@@ -5,6 +5,12 @@ with open("README.md", "r", encoding="utf-8") as f:
     # Remove GitHub dark mode images
     DESCRIPTION = "".join([line for line in f if "gh-dark-mode-only" not in line])
 
+# Optional dependencies
+extras = {}
+
+extras["elasticsearch"] = ["elasticsearch>=7.8.0"]
+extras["all"] = extras["elasticsearch"]
+
 setup(
     name="paperetl",
     version="2.5.0",
@@ -25,7 +31,6 @@ setup(
     python_requires=">=3.10",
     install_requires=[
         "beautifulsoup4>=4.8.1",
-        "elasticsearch>=7.8.0",
         "lxml>=4.5.0",
         "nltk>=3.5",
         "pandas>=1.1.0",
@@ -33,6 +38,7 @@ setup(
         "PyYAML>=5.3",
         "requests>=2.22.0",
     ],
+    extras_requires=extras,
     classifiers=[
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
