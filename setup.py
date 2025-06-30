@@ -38,7 +38,7 @@ setup(
         "PyYAML>=5.3",
         "requests>=2.22.0",
     ],
-    extras_requires=extras,
+    extras_require=extras,
     classifiers=[
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
