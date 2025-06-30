@@ -77,7 +77,11 @@ class TEI:
             parser.parse(datetime.datetime.now().strftime("%Y-%m-%d")),
         )
 
-        return Article(metadata, sections)
+        # Citation references
+        citations = TEI.citations(soup)
+
+        # Create article and return
+        return Article(metadata, sections, citations)
 
     @staticmethod
     def date(published):
@@ -242,3 +246,25 @@ class TEI:
                 sections.extend([(name, x) for x in Table.extract(table)])
 
         return sections
+
+    @staticmethod
+    def citations(soup):
+        """
+        Gets a list of citation references for this article.
+
+        Args:
+            soup: bs4 handle
+
+        Returns:
+            list of citation references
+        """
+
+        # Citation references
+        citations = []
+
+        references = soup.find("div", {"type": "references"})
+        if references:
+            for title in references.find("title", {"level": "a"}):
+                citations.append(hashlib.sha1(title.encode("utf-8")).hexdigest())
+
+        return citations
