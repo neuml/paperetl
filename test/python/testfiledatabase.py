@@ -21,7 +21,7 @@ class RequestsStub:
 
     def __init__(self):
         self.ok = True
-        with open(Utils.FILE + "/data/0.xml", "r", encoding="utf-8") as xml:
+        with open(Utils.DATA + "/0.xml", "r", encoding="utf-8") as xml:
             self.text = xml.read()
 
 
@@ -37,21 +37,21 @@ class TestFileDatabase(TestProcess):
         """
 
         # Build articles database
-        Execute.run(Utils.FILE + "/data", Utils.FILE + "/models", None, True, 1)
+        Execute.run(Utils.DATA, Utils.MODELS, None, True, 1)
 
         # Generate ids filter file
-        with open(Utils.FILE + "/models/ids", "w", encoding="utf-8") as output:
+        with open(Utils.MODELS + "/ids", "w", encoding="utf-8") as output:
             output.write("0\n")
 
         # Run again with replace=False and ids filtering
-        Execute.run(Utils.FILE + "/data", Utils.FILE + "/models", Utils.FILE + "/models")
+        Execute.run(Utils.DATA, Utils.MODELS, Utils.MODELS)
 
         # Generate codes filter file
-        with open(Utils.FILE + "/models/codes", "w", encoding="utf-8") as output:
+        with open(Utils.MODELS + "/codes", "w", encoding="utf-8") as output:
             output.write("0\n")
 
         # Run again with replace=False and ids + codes filtering
-        Execute.run(Utils.FILE + "/data", Utils.FILE + "/models", Utils.FILE + "/models")
+        Execute.run(Utils.DATA, Utils.MODELS, Utils.MODELS)
 
     def setUp(self):
         """
@@ -59,7 +59,7 @@ class TestFileDatabase(TestProcess):
         """
 
         # Connect to articles database
-        self.db = sqlite3.connect(Utils.FILE + "/models/articles.sqlite")
+        self.db = sqlite3.connect(Utils.MODELS + "/articles.sqlite")
 
         # Create database cursor
         self.cur = self.db.cursor()

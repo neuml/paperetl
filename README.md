@@ -36,13 +36,13 @@ paperetl is an ETL library for processing medical and scientific papers.
 
 paperetl supports the following sources:
 
-- File formats:
-    - PDF
-    - XML (arXiv, PubMed, TEI)
-    - CSV
-- COVID-19 Research Dataset (CORD-19)
+- Full PDF articles
+- [PubMed XML](https://pubmed.ncbi.nlm.nih.gov/download/)
+- [ArXiv XML](https://info.arxiv.org/help/api/basics.html)
+- [Text Encoding Initiative (TEI) XML](https://grobid.readthedocs.io/en/latest/TEI-encoding-of-results/)
+- CSV with article metadta
 
-paperetl supports the following output options for storing articles:
+paperetl supports the following storage options for parsed articles.
 
 - SQLite
 - Elasticsearch
@@ -77,7 +77,7 @@ _Note: In some cases, the GROBID engine pool can be exhausted, resulting in a 50
 
 ### Docker
 
-A Dockerfile with commands to install paperetl, all dependencies and scripts is available in this repository.
+A Dockerfile with commands to install paperetl, all dependencies and scripts are available in this repository.
 
 ```
 wget https://raw.githubusercontent.com/neuml/paperetl/master/docker/Dockerfile
@@ -136,38 +136,3 @@ python -m paperetl.file paperetl/data yaml://paperetl/yaml
 ```
 
 Converted files will be stored in paperetl/(json|yaml)
-
-### Load CORD-19
-
-_Note: The final version of CORD-19 was released on 2022-06-22. But this is still a large, valuable set of medical documents._
-
-The following example shows how to use paperetl to load the CORD-19 dataset into a SQLite database.
-
-1. Download and extract the dataset from [Allen Institute for AI CORD-19 Release Page](https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/historical_releases.html).
-
-    ```
-    scripts/getcord19.sh cord19/data
-    ```
-
-    The script above retrieves and unpacks the latest copy of CORD-19 into a directory named `cord19/data`. An optional second argument sets a specific date of the dataset in the format YYYY-MM-DD (ex. 2021-01-01) which defaults to the latest date.
-
-2. Generate entry-dates.csv for current version of the dataset
-
-    ```
-    python -m paperetl.cord19.entry cord19/data
-    ```
-
-    An optional second argument sets a specific date of the dataset in the format YYYY-MM-DD (ex. 2021-01-01) which defaults of the latest
-    date. This should match the date used in Step 1.
-
-3. Build database
-
-    ```
-    python -m paperetl.cord19 cord19/data cord19/models
-    ```
-
-    Once complete, there will be an articles.sqlite file in cord19/models. As with earlier examples, the data can also be loaded into Elasticsearch.
-
-    ```
-    python -m paperetl.cord19 cord19/data http://localhost:9200
-    ```

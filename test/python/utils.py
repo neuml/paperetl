@@ -11,8 +11,8 @@ class Utils:
     """
 
     PATH = "/tmp/paperetl"
-    CORD19 = PATH + "/cord19"
-    FILE = PATH + "/file"
+    DATA = PATH + "/data"
+    MODELS = PATH + "/models"
 
     @staticmethod
     def hashtext(text):

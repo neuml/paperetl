@@ -42,10 +42,10 @@ class TestFileExport(TestProcess):
         """
 
         # Output directory
-        output = Utils.FILE + "/models"
+        output = Utils.MODELS
 
         # Build articles database
-        Execute.run(Utils.FILE + "/data", f"{method}://{output}")
+        Execute.run(Utils.DATA, f"{method}://{output}")
 
         # Count of articles/sections
         articles = 0
