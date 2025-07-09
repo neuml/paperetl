@@ -29,12 +29,12 @@
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------
 
-paperetl is an ETL library for processing medical and scientific papers.
+`paperetl` is an ETL library for processing medical and scientific papers.
 
 ![architecture](https://raw.githubusercontent.com/neuml/paperetl/master/images/architecture.png#gh-light-mode-only)
 ![architecture](https://raw.githubusercontent.com/neuml/paperetl/master/images/architecture-dark.png#gh-dark-mode-only)
 
-paperetl supports the following sources:
+`paperetl` supports the following sources:
 
 - Full PDF articles
 - [PubMed XML](https://pubmed.ncbi.nlm.nih.gov/download/)
@@ -42,7 +42,7 @@ paperetl supports the following sources:
 - [Text Encoding Initiative (TEI) XML](https://grobid.readthedocs.io/en/latest/TEI-encoding-of-results/)
 - CSV with article metadta
 
-paperetl supports the following datastores for parsed articles.
+`paperetl` supports the following datastores for parsed articles.
 
 - SQLite
 - JSON files
@@ -62,7 +62,7 @@ pip install paperetl
 
 Python 3.10+ is supported. Using a Python [virtual environment](https://docs.python.org/3/library/venv.html) is recommended.
 
-paperetl can also be installed directly from GitHub to access the latest, unreleased features.
+`paperetl` can also be installed directly from GitHub to access the latest, unreleased features.
 
 ```
 pip install git+https://github.com/neuml/paperetl
@@ -80,7 +80,7 @@ _Note: In some cases, the GROBID engine pool can be exhausted, resulting in a 50
 
 ### Docker
 
-A Dockerfile with commands to install paperetl, all dependencies and scripts are available in this repository.
+A Dockerfile with commands to install `paperetl`, all dependencies and scripts are available in this repository.
 
 ```
 wget https://raw.githubusercontent.com/neuml/paperetl/master/docker/Dockerfile
@@ -88,7 +88,7 @@ docker build -t paperetl -f Dockerfile .
 docker run --name paperetl --rm -it paperetl
 ```
 
-This will bring up a paperetl command shell. Standard Docker commands can be used to copy files over or commands can be run directly in the shell to retrieve input content.
+This will bring up a `paperetl` command shell. Standard Docker commands can be used to copy files over or commands can be run directly in the shell to retrieve input content.
 
 ## Examples
 
@@ -96,11 +96,11 @@ This will bring up a paperetl command shell. Standard Docker commands can be use
 
 | Notebook  | Description  |       |
 |:----------|:-------------|------:|
-| [Introducing paperetl](https://github.com/neuml/paperetl/blob/master/examples/01_Introducing_paperetl.ipynb) | Overview of the functionality provided by paperetl | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/neuml/paperetl/blob/master/examples/01_Introducing_paperetl.ipynb) |
+| [Introducing paperetl](https://github.com/neuml/paperetl/blob/master/examples/01_Introducing_paperetl.ipynb) | Overview of the functionality provided by `paperetl` | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/neuml/paperetl/blob/master/examples/01_Introducing_paperetl.ipynb) |
 
 ### Load Articles into SQLite
 
-The following example shows how to use paperetl to load a set of medical/scientific articles into a SQLite database.
+The following example shows how to use `paperetl` to load a set of medical/scientific articles into a SQLite database.
 
 1. Download the desired medical/scientific articles in a local directory. For this example, it is assumed the articles are in a directory named `paperetl/data`
 
@@ -130,7 +130,7 @@ Once complete, there will be an articles index in Elasticsearch with the metadat
 
 ### Convert articles to JSON/YAML
 
-paperetl can also be used to convert articles into JSON or YAML files. This is useful if the data is to be fed into another system or for manual inspection/debugging of a single file.
+`paperetl` can also be used to convert articles into JSON or YAML files. This is useful if the data is to be fed into another system or for manual inspection/debugging of a single file.
 
 JSON:
 
