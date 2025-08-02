@@ -38,7 +38,7 @@ class TestOptional(unittest.TestCase):
 
     def testElasticsearch(self):
         """
-        Test missing training dependencies
+        Test missing elasticsearch dependencies
         """
 
         from paperetl.elastic import Elastic
