@@ -13,7 +13,7 @@ extras["all"] = extras["elasticsearch"]
 
 setup(
     name="paperetl",
-    version="2.5.1",
+    version="2.6.0",
     author="NeuML",
     description="ETL processes for medical and scientific papers",
     long_description=DESCRIPTION,
