@@ -2,7 +2,13 @@
 Elasticsearch module
 """
 
-from elasticsearch import Elasticsearch, helpers
+# Conditional import
+try:
+    from elasticsearch import Elasticsearch, helpers
+
+    ELASTICSEARCH = True
+except ImportError:
+    ELASTICSEARCH = False
 
 from .database import Database
 
@@ -30,6 +36,9 @@ class Elastic(Database):
             url: elasticsearch url
             replace: If database should be recreated
         """
+
+        if not ELASTICSEARCH:
+            raise ImportError('Elasticsearch is not available - install "elasticsearch" extra to enable')
 
         # Connect to ES instance
         self.connection = Elasticsearch(hosts=[url], request_timeout=60, retry_on_timeout=True)
