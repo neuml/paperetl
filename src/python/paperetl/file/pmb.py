@@ -453,7 +453,7 @@ class PMB:
         for reference in element.findall("PubmedData/ReferenceList/Reference"):
             for article in reference.findall("ArticleIdList/ArticleId"):
                 # Get PubMed Id, if applicable
-                uid = int(article.text) if article.text and article.attrib["IdType"] == "pubmed" else None
+                uid = int(article.text) if article.text and article.text.isdigit() and article.attrib["IdType"] == "pubmed" else None
 
                 # Validate uid is valid and in list of valid ids, if applicable
                 if uid is not None and (not ids or uid in ids):
